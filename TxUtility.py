@@ -85,14 +85,13 @@ class TxUtility:
             bdAmount = amount * self.rate
             Amount = util.encodeUint64(bdAmount)
             # 为签名留白
-            list = ['0' for x in range(0, 64)]
+            list = ['00' for x in range(0, 64)]
             signull = binascii.a2b_hex(''.join(list))
             # 接收者公钥哈希
             toPubkeyHash = binascii.a2b_hex(toPubkeyHashStr)
             # 长度
-            allPayload = util.encodeUint64(0)
+            allPayload = util.encodeUint32(0)
             RawTransaction = version + type + nonece + fromPubkeyHash + gasPrice + Amount + signull+toPubkeyHash+allPayload
-            print('aaa', RawTransaction)
             RawTransactionStr = binascii.b2a_hex(RawTransaction).decode()
             return RawTransactionStr
         except (OSError, TypeError) as reason:
