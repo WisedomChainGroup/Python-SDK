@@ -30,11 +30,12 @@ class Transaction:
         self.sig = sig
 
     def _get_raw(self, null_sig: bool) -> bytes:
-        sig = b''
+        list = ['00' for x in range(0, 64)]
+        sig = binascii.a2b_hex(''.join(list))
         if not null_sig:
             sig = self.sig
-        ret = Utils.encode_u64(self.version)
-        ret += Utils.encode_u64(self.tx_type)
+        ret = Utils.encode_u8(self.version)
+        ret += Utils.encode_u8(self.tx_type)
         ret += Utils.encode_u64(self.tx_nonce)
         ret += self.tx_from
         ret += Utils.encode_u64(self.gas_price)
@@ -60,65 +61,9 @@ class Transaction:
 
 class TxUtility:
 
-    def __init__(self):
-        self.serviceCharge = 200000
-        self.rate = 100000000
-
     @staticmethod
     def sign_transaction(tx: Transaction, sk: bytes):
         tx.sig = nacl.signing.SigningKey(sk).sign(tx.get_raw_for_sign())
-
-    # 构建签名事务
-    def sign_tx(self, RawTransactionHex, prikeyStr):
-        try:
-            util = Utils()
-            sha3Keccack = Sha3Keccack()
-            RawTransaction = binascii.a2b_hex(RawTransactionHex)
-            # 私钥字节数组
-            privkey = binascii.a2b_hex(prikeyStr)
-            # version
-            version = util.byte_array_copy(RawTransaction, 0, 1)
-            # type
-            type = util.byte_array_copy(RawTransaction, 1, 1)
-            # nonce
-            nonce = util.byte_array_copy(RawTransaction, 2, 8)
-            # from
-            form = util.byte_array_copy(RawTransaction, 10, 32)
-            # gasprice
-            gasprice = util.byte_array_copy(RawTransaction, 42, 8)
-            # amount
-            amount = util.byte_array_copy(RawTransaction, 50, 8)
-            # signo
-            signo = util.byte_array_copy(RawTransaction, 58, 64)
-            # to
-            to = util.byte_array_copy(RawTransaction, 122, 20)
-            # payloadlen
-            payloadlen = util.byte_array_copy(RawTransaction, 142, 4)
-            # payload
-            payload = util.byte_array_copy(RawTransaction, 146, util.decode_u32(payloadlen))
-            RawTransactionNoSign = version + type + nonce + form + gasprice + amount + signo + to + payloadlen + payload
-            RawTransactionNoSig = version + type + nonce + form + gasprice + amount
-            # 签名数据
-            ed25519PrivateKey = Ed25519PrivateKey(privkey)
-            sig = ed25519PrivateKey.sign(RawTransactionNoSign)
-            transha = sha3Keccack.keccak256(RawTransactionNoSig + sig + to + payloadlen + payload)
-            signRawBasicTransaction = version + transha + type + nonce + form + gasprice + amount + sig + to + payloadlen + payload
-            signRawBasicTransactionHex = binascii.b2a_hex(signRawBasicTransaction)
-            return signRawBasicTransactionHex.decode()
-        except (OSError, TypeError) as reason:
-            print('错误的原因是:', str(reason))
-
-    def ClientToTransferAccount(self, fromPubkeyStr, toPubkeyHashStr, amount, prikeyStr, nonce):
-        try:
-            print('000')
-            RawTransactionHex = TxUtility.create_transfer_tx(fromPubkeyStr, toPubkeyHashStr, amount, nonce)
-            print('111', type(RawTransactionHex), RawTransactionHex)
-            signRawBasicTransaction = binascii.a2b_hex(TxUtility.sign_tx(RawTransactionHex, prikeyStr))
-            hash = Utils.byte_array_copy(signRawBasicTransaction, 1, 32)
-            txHash = binascii.b2a_hex(hash).decode()
-            traninfo = binascii.b2a_hex(signRawBasicTransaction).decode()
-        except (OSError, TypeError) as reason:
-            return ''
 
     # 构造交易事务
     def create_transfer_tx(self, tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int) -> Transaction:
@@ -126,25 +71,29 @@ class TxUtility:
         # 类型：WDC转账
         tx.tx_type = TRANSFER
         # Nonce 无符号64位
-        tx.nonce = tx_nonce
+        tx.nonce = tx_nonce + 1
         # 签发者公钥哈希 20字节
         tx.tx_from = tx_from
         tx.tx_to = tx_to
-        tx.gas_price = FEE / GAS_TABLE[TRANSFER]
+        tx.gas_price = round(FEE / GAS_TABLE[TRANSFER])
         # 转账金额 无符号64位
         tx.tx_amount = tx_amount
         return tx
 
 
 if __name__ == '__main__':
-    fromPubkeyStr = 'e872bbcb080c61608d0260d5b6cc7a73c8b89c446365132197aa84679bddd3d1'
-    toPubkeyHashStr = '0d5babadfba67318fce816e3ebf27d727808c98f'
+    fromPubkeyStr = binascii.a2b_hex('e872bbcb080c61608d0260d5b6cc7a73c8b89c446365132197aa84679bddd3d1')
+    toPubkeyHashStr = binascii.a2b_hex('0d5babadfba67318fce816e3ebf27d727808c98f')
     amount = 10
-    prikeyStr = '12Ddbt4bo7qqyfHcP9ApJQDcdWRBnBZzHo'
+    prikeyStr = binascii.a2b_hex('fe61c314b09570f2662322fd4c12dcc5c1673682953df1ad4d821ede0e8f06c4')
     nonce = 10
     b = TxUtility()
+    d = round(FEE / GAS_TABLE[TRANSFER]).to_bytes(8, 'big')
+    
     print('1')
     # a = b.ClientToTransferAccount(fromPubkeyStr, toPubkeyHashStr, amount, prikeyStr, nonce)
     a = b.create_transfer_tx(fromPubkeyStr, toPubkeyHashStr, amount, nonce)
-    print(type(a))
-    print(a)
+    TxUtility.sign_transaction(a, prikeyStr)
+    print(binascii.b2a_hex(a.get_hash()).decode())
+    print(binascii.b2a_hex(a.get_raw_for_hash()).decode())
+    print(binascii.b2a_hex(a.get_raw_for_sign()).decode())

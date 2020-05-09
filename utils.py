@@ -19,6 +19,16 @@ class Utils:
         r = data.to_bytes(8, 'big')
         return r
 
+    @staticmethod
+    def encode_u32(data: int) -> bytes:
+        r = data.to_bytes(4, 'big')
+        return r
+
+    @staticmethod
+    def encode_u8(data: int) -> bytes:
+        r = data.to_bytes(1, 'big')
+        return r
+
 
 if __name__ == '__main__':
     sks = binascii.a2b_hex("9a90128b52960688cc67ba76a04088aa90525c35abc2282acfa72f6c0eedef5f")
