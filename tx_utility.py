@@ -122,9 +122,9 @@ class TxUtility:
         try:
             util = Utils()
             # 版本号
-            version = bytes('0x01', 'utf8')
+            version = b'\x01'
             # 类型：WDC转账
-            type = bytes('0x01', 'utf8')
+            type = b'\x01'
             # Nonce 无符号64位
             nonece = util.encode_u64(nonce + 1)
             # 签发者公钥哈希 20字节
@@ -135,7 +135,7 @@ class TxUtility:
             bdAmount = amount * self.rate
             Amount = util.encode_u64(bdAmount)
             # 为签名留白
-            list = ['0' for x in range(0, 64)]
+            list = ['00' for x in range(0, 64)]
             signull = binascii.a2b_hex(''.join(list))
             # 接收者公钥哈希
             toPubkeyHash = binascii.a2b_hex(toPubkeyHashStr)
