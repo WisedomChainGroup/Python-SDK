@@ -9,7 +9,7 @@ from _pysha3 import keccak_256
 
 GAS_TABLE = [0, 50000]
 
-FEE = 2000000
+FEE = 200000
 
 TRANSFER = 1
 DEFAULT_VERSION = 1
@@ -42,7 +42,7 @@ class Transaction:
         ret += Utils.encode_u64(self.tx_amount)
         ret += sig
         ret += self.tx_to
-        ret += Utils.encode_u64(len(self.payload))
+        ret += Utils.encode_u32(len(self.payload))
         ret += self.payload
         return ret
 
@@ -63,7 +63,7 @@ class TxUtility:
 
     @staticmethod
     def sign_transaction(tx: Transaction, sk: bytes):
-        tx.sig = nacl.signing.SigningKey(sk).sign(tx.get_raw_for_sign())
+        tx.sig = nacl.signing.SigningKey(sk).sign("0".encode("utf8"))[1:]
 
     # 构造交易事务
     def create_transfer_tx(self, tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int) -> Transaction:
@@ -71,7 +71,7 @@ class TxUtility:
         # 类型：WDC转账
         tx.tx_type = TRANSFER
         # Nonce 无符号64位
-        tx.nonce = tx_nonce + 1
+        tx.nonce = tx_nonce
         # 签发者公钥哈希 20字节
         tx.tx_from = tx_from
         tx.tx_to = tx_to
@@ -84,16 +84,16 @@ class TxUtility:
 if __name__ == '__main__':
     fromPubkeyStr = binascii.a2b_hex('e872bbcb080c61608d0260d5b6cc7a73c8b89c446365132197aa84679bddd3d1')
     toPubkeyHashStr = binascii.a2b_hex('0d5babadfba67318fce816e3ebf27d727808c98f')
-    amount = 10
+    amount = 10 * 100000000
     prikeyStr = binascii.a2b_hex('fe61c314b09570f2662322fd4c12dcc5c1673682953df1ad4d821ede0e8f06c4')
-    nonce = 10
+    nonce = 11
     b = TxUtility()
-    d = round(FEE / GAS_TABLE[TRANSFER]).to_bytes(8, 'big')
-    
     print('1')
     # a = b.ClientToTransferAccount(fromPubkeyStr, toPubkeyHashStr, amount, prikeyStr, nonce)
     a = b.create_transfer_tx(fromPubkeyStr, toPubkeyHashStr, amount, nonce)
-    TxUtility.sign_transaction(a, prikeyStr)
     print(binascii.b2a_hex(a.get_hash()).decode())
-    print(binascii.b2a_hex(a.get_raw_for_hash()).decode())
     print(binascii.b2a_hex(a.get_raw_for_sign()).decode())
+    b.sign_transaction(a, prikeyStr)
+    print(a.sig)
+    print(binascii.b2a_hex(a.get_raw_for_hash()).decode())
+
