@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
-from PYSDK.Utils import Utils
-from PYSDK.Ed25519PrivateKey import Ed25519PrivateKey
-from PYSDK.Sha3Keccack import Sha3Keccack
-from PYSDK.APIResult import APIResult
+from Utils import Utils
+from Ed25519PrivateKey import Ed25519PrivateKey
+from Sha3Keccack import Sha3Keccack
+from APIResult import APIResult
 import binascii
 import json
 
@@ -72,9 +72,9 @@ class TxUtility:
         try:
             util = Utils()
             # 版本号
-            version = bytes('0x01', 'utf8')
+            version = b'\x01'
             # 类型：WDC转账
-            type = bytes('0x01', 'utf8')
+            type = b'\x01'
             # Nonce 无符号64位
             nonece = util.encodeUint64(nonce + 1)
             # 签发者公钥哈希 20字节
@@ -90,8 +90,9 @@ class TxUtility:
             # 接收者公钥哈希
             toPubkeyHash = binascii.a2b_hex(toPubkeyHashStr)
             # 长度
-            allPayload = util.encodeUint32(0)
+            allPayload = util.encodeUint64(0)
             RawTransaction = version + type + nonece + fromPubkeyHash + gasPrice + Amount + signull+toPubkeyHash+allPayload
+            print('aaa', RawTransaction)
             RawTransactionStr = binascii.b2a_hex(RawTransaction).decode()
             return RawTransactionStr
         except (OSError, TypeError) as reason:
