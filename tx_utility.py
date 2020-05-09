@@ -3,15 +3,20 @@
 from utils import Utils
 from ed25519 import Ed25519PrivateKey
 from sha3_keccak import Sha3Keccack
-from api_result import APIResult
 import binascii
-import json
 import nacl.signing
 from _pysha3 import keccak_256
 
+GAS_TABLE = [0, 50000]
+
+FEE = 2000000
+
+TRANSFER = 1
+DEFAULT_VERSION = 1
+
 
 class Transaction:
-    def __init__(self, tx_from: bytes = b'', gas_price: int = 0, version: int = 1, tx_type: int = 0,
+    def __init__(self, tx_from: bytes = b'', gas_price: int = 0, version: int = DEFAULT_VERSION, tx_type: int = 0,
                  tx_nonce: int = 0, tx_amount: int = 0, payload: bytes = b'', tx_to: bytes = b'', sig: bytes = b''):
         self.version = version
         self.tx_type = tx_type
@@ -106,46 +111,29 @@ class TxUtility:
     def ClientToTransferAccount(self, fromPubkeyStr, toPubkeyHashStr, amount, prikeyStr, nonce):
         try:
             print('000')
-            RawTransactionHex = TxUtility.CreateRawTransaction(fromPubkeyStr, toPubkeyHashStr, amount, nonce)
+            RawTransactionHex = TxUtility.create_transfer_tx(fromPubkeyStr, toPubkeyHashStr, amount, nonce)
             print('111', type(RawTransactionHex), RawTransactionHex)
             signRawBasicTransaction = binascii.a2b_hex(TxUtility.sign_tx(RawTransactionHex, prikeyStr))
             hash = Utils.byte_array_copy(signRawBasicTransaction, 1, 32)
             txHash = binascii.b2a_hex(hash).decode()
             traninfo = binascii.b2a_hex(signRawBasicTransaction).decode()
-            Result = APIResult(txHash, traninfo)
-            return json.dumps(Result.__dict__)
         except (OSError, TypeError) as reason:
             return ''
 
     # 构造交易事务
-    def CreateRawTransaction(self, fromPubkeyStr, toPubkeyHashStr, amount, nonce):
-        try:
-            util = Utils()
-            # 版本号
-            version = b'\x01'
-            # 类型：WDC转账
-            type = b'\x01'
-            # Nonce 无符号64位
-            nonece = util.encode_u64(nonce + 1)
-            # 签发者公钥哈希 20字节
-            fromPubkeyHash = binascii.a2b_hex(fromPubkeyStr)
-            # gas单价
-            gasPrice = util.encode_u64(round(50000 / self.serviceCharge))
-            # 转账金额 无符号64位
-            bdAmount = amount * self.rate
-            Amount = util.encode_u64(bdAmount)
-            # 为签名留白
-            list = ['00' for x in range(0, 64)]
-            signull = binascii.a2b_hex(''.join(list))
-            # 接收者公钥哈希
-            toPubkeyHash = binascii.a2b_hex(toPubkeyHashStr)
-            # 长度
-            allPayload = util.encodeUint32(0)
-            RawTransaction = version + type + nonece + fromPubkeyHash + gasPrice + Amount + signull + toPubkeyHash + allPayload
-            RawTransactionStr = binascii.b2a_hex(RawTransaction).decode()
-            return RawTransactionStr
-        except (OSError, TypeError) as reason:
-            return ''
+    def create_transfer_tx(self, tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int) -> Transaction:
+        tx = Transaction()
+        # 类型：WDC转账
+        tx.tx_type = TRANSFER
+        # Nonce 无符号64位
+        tx.nonce = tx_nonce
+        # 签发者公钥哈希 20字节
+        tx.tx_from = tx_from
+        tx.tx_to = tx_to
+        tx.gas_price = FEE / GAS_TABLE[TRANSFER]
+        # 转账金额 无符号64位
+        tx.tx_amount = tx_amount
+        return tx
 
 
 if __name__ == '__main__':
@@ -157,6 +145,6 @@ if __name__ == '__main__':
     b = TxUtility()
     print('1')
     # a = b.ClientToTransferAccount(fromPubkeyStr, toPubkeyHashStr, amount, prikeyStr, nonce)
-    a = b.CreateRawTransaction(fromPubkeyStr, toPubkeyHashStr, amount, nonce)
+    a = b.create_transfer_tx(fromPubkeyStr, toPubkeyHashStr, amount, nonce)
     print(type(a))
     print(a)
