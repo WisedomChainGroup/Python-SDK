@@ -1,11 +1,57 @@
 #!/usr/bin/python3
 
-from PYSDK.Utils import Utils
-from PYSDK.Ed25519PrivateKey import Ed25519PrivateKey
-from PYSDK.Sha3Keccack import Sha3Keccack
-from PYSDK.APIResult import APIResult
+from utils import Utils
+from ed25519 import Ed25519PrivateKey
+from sha3_keccak import Sha3Keccack
+from api_result import APIResult
 import binascii
 import json
+import nacl.signing
+from _pysha3 import keccak_256
+
+
+class Transaction:
+    def __init__(self, tx_from: bytes = b'', gas_price: int = 0, version: int = 1, tx_type: int = 0,
+                 tx_nonce: int = 0, tx_amount: int = 0, payload: bytes = b'', tx_to: bytes = b'', sig: bytes = b''):
+        self.version = version
+        self.tx_type = tx_type
+        self.tx_nonce = tx_nonce
+        self.tx_from = tx_from
+        self.gas_price = gas_price
+        self.version = version
+        self.tx_amount = tx_amount
+        self.payload = payload
+        self.tx_to = tx_to
+        self.sig = sig
+
+    def _get_raw(self, null_sig: bool) -> bytes:
+        sig = b''
+        if not null_sig:
+            sig = self.sig
+        ret = Utils.encode_u64(self.version)
+        ret += Utils.encode_u64(self.tx_type)
+        ret += Utils.encode_u64(self.tx_nonce)
+        ret += self.tx_from
+        ret += Utils.encode_u64(self.gas_price)
+        ret += Utils.encode_u64(self.tx_amount)
+        ret += sig
+        ret += self.tx_to
+        ret += Utils.encode_u64(len(self.payload))
+        ret += self.payload
+        return ret
+
+    def get_raw_for_sign(self) -> bytes:
+        return self._get_raw(True)
+
+    def get_raw_for_hash(self) -> bytes:
+        return self._get_raw(False)
+
+    def get_hash(self) -> bytes:
+        k = keccak_256()
+        k.update(self.get_raw_for_hash())
+        sks = k.hexdigest()
+        return binascii.a2b_hex(sks)
+
 
 class TxUtility:
 
@@ -13,8 +59,12 @@ class TxUtility:
         self.serviceCharge = 200000
         self.rate = 100000000
 
+    @staticmethod
+    def sign_transaction(tx: Transaction, sk: bytes):
+        tx.sig = nacl.signing.SigningKey(sk).sign(tx.get_raw_for_sign())
+
     # 构建签名事务
-    def signRawBasicTransaction(self, RawTransactionHex, prikeyStr):
+    def sign_tx(self, RawTransactionHex, prikeyStr):
         try:
             util = Utils()
             sha3Keccack = Sha3Keccack()
@@ -22,25 +72,25 @@ class TxUtility:
             # 私钥字节数组
             privkey = binascii.a2b_hex(prikeyStr)
             # version
-            version = util.bytearraycopy(RawTransaction, 0, 1)
+            version = util.byte_array_copy(RawTransaction, 0, 1)
             # type
-            type = util.bytearraycopy(RawTransaction, 1, 1)
+            type = util.byte_array_copy(RawTransaction, 1, 1)
             # nonce
-            nonce = util.bytearraycopy(RawTransaction, 2, 8)
+            nonce = util.byte_array_copy(RawTransaction, 2, 8)
             # from
-            form = util.bytearraycopy(RawTransaction, 10, 32)
+            form = util.byte_array_copy(RawTransaction, 10, 32)
             # gasprice
-            gasprice = util.bytearraycopy(RawTransaction, 42, 8)
+            gasprice = util.byte_array_copy(RawTransaction, 42, 8)
             # amount
-            amount = util.bytearraycopy(RawTransaction, 50, 8)
+            amount = util.byte_array_copy(RawTransaction, 50, 8)
             # signo
-            signo = util.bytearraycopy(RawTransaction, 58, 64)
+            signo = util.byte_array_copy(RawTransaction, 58, 64)
             # to
-            to = util.bytearraycopy(RawTransaction, 122, 20)
+            to = util.byte_array_copy(RawTransaction, 122, 20)
             # payloadlen
-            payloadlen = util.bytearraycopy(RawTransaction, 142, 4)
+            payloadlen = util.byte_array_copy(RawTransaction, 142, 4)
             # payload
-            payload = util.bytearraycopy(RawTransaction, 146, util.decodeUint32(payloadlen))
+            payload = util.byte_array_copy(RawTransaction, 146, util.decode_u32(payloadlen))
             RawTransactionNoSign = version + type + nonce + form + gasprice + amount + signo + to + payloadlen + payload
             RawTransactionNoSig = version + type + nonce + form + gasprice + amount
             # 签名数据
@@ -58,8 +108,8 @@ class TxUtility:
             print('000')
             RawTransactionHex = TxUtility.CreateRawTransaction(fromPubkeyStr, toPubkeyHashStr, amount, nonce)
             print('111', type(RawTransactionHex), RawTransactionHex)
-            signRawBasicTransaction = binascii.a2b_hex(TxUtility.signRawBasicTransaction(RawTransactionHex, prikeyStr))
-            hash = Utils.bytearraycopy(signRawBasicTransaction, 1, 32)
+            signRawBasicTransaction = binascii.a2b_hex(TxUtility.sign_tx(RawTransactionHex, prikeyStr))
+            hash = Utils.byte_array_copy(signRawBasicTransaction, 1, 32)
             txHash = binascii.b2a_hex(hash).decode()
             traninfo = binascii.b2a_hex(signRawBasicTransaction).decode()
             Result = APIResult(txHash, traninfo)
@@ -76,14 +126,14 @@ class TxUtility:
             # 类型：WDC转账
             type = bytes('0x01', 'utf8')
             # Nonce 无符号64位
-            nonece = util.encodeUint64(nonce + 1)
+            nonece = util.encode_u64(nonce + 1)
             # 签发者公钥哈希 20字节
             fromPubkeyHash = binascii.a2b_hex(fromPubkeyStr)
             # gas单价
-            gasPrice = util.encodeUint64(round(50000 / self.serviceCharge))
+            gasPrice = util.encode_u64(round(50000 / self.serviceCharge))
             # 转账金额 无符号64位
             bdAmount = amount * self.rate
-            Amount = util.encodeUint64(bdAmount)
+            Amount = util.encode_u64(bdAmount)
             # 为签名留白
             list = ['0' for x in range(0, 64)]
             signull = binascii.a2b_hex(''.join(list))
@@ -91,7 +141,7 @@ class TxUtility:
             toPubkeyHash = binascii.a2b_hex(toPubkeyHashStr)
             # 长度
             allPayload = util.encodeUint32(0)
-            RawTransaction = version + type + nonece + fromPubkeyHash + gasPrice + Amount + signull+toPubkeyHash+allPayload
+            RawTransaction = version + type + nonece + fromPubkeyHash + gasPrice + Amount + signull + toPubkeyHash + allPayload
             RawTransactionStr = binascii.b2a_hex(RawTransaction).decode()
             return RawTransactionStr
         except (OSError, TypeError) as reason:
@@ -106,7 +156,7 @@ if __name__ == '__main__':
     nonce = 10
     b = TxUtility()
     print('1')
-    #a = b.ClientToTransferAccount(fromPubkeyStr, toPubkeyHashStr, amount, prikeyStr, nonce)
+    # a = b.ClientToTransferAccount(fromPubkeyStr, toPubkeyHashStr, amount, prikeyStr, nonce)
     a = b.CreateRawTransaction(fromPubkeyStr, toPubkeyHashStr, amount, nonce)
     print(type(a))
     print(a)

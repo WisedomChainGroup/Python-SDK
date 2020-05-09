@@ -1,10 +1,8 @@
 #!/usr/bin/python3
 
-import nacl.encoding
 import nacl.signing
 import binascii
-import hashlib
-from nacl.public import PrivateKey, PublicKey, Box
+
 
 class Ed25519PrivateKey:
     def __init__(self, privateKey):
