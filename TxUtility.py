@@ -80,7 +80,7 @@ class TxUtility:
             # 签发者公钥哈希 20字节
             fromPubkeyHash = binascii.a2b_hex(fromPubkeyStr)
             # gas单价
-            gasPrice = util.encodeUint64(round(50000 / self.serviceCharge))
+            gasPrice = util.encodeUint64(round(self.serviceCharge / 50000))
             # 转账金额 无符号64位
             bdAmount = amount * self.rate
             Amount = util.encodeUint64(bdAmount)

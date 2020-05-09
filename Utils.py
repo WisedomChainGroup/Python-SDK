@@ -14,13 +14,13 @@ class Utils:
         return r
 
     def encodeUint64(self, data):
-        r = (data).to_bytes(16, 'big')
+        r = (data).to_bytes(8, 'big')
         return r
 
 if __name__ == '__main__':
     sks = binascii.a2b_hex("9a90128b52960688cc67ba76a04088aa90525c35abc2282acfa72f6c0eedef5f")
     a = Utils()
     sk = a.bytearraycopy(sks, 142, 4)
-    skd = binascii.b2a_hex(a.encodeUint64(round(100000 / 200000))).decode()
-    print('a', skd)
+    skd = binascii.b2a_hex(a.encodeUint64(11)).decode()
+    print('a', skd, len(skd))
 
