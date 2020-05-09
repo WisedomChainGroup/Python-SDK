@@ -16,34 +16,37 @@ class TxUtility:
     # 构建签名事务
     def signRawBasicTransaction(self, RawTransactionHex, prikeyStr):
         try:
+            util = Utils()
+            sha3Keccack = Sha3Keccack()
             RawTransaction = binascii.a2b_hex(RawTransactionHex)
             # 私钥字节数组
             privkey = binascii.a2b_hex(prikeyStr)
             # version
-            version = Utils.bytearraycopy(RawTransaction, 0, 1)
+            version = util.bytearraycopy(RawTransaction, 0, 1)
             # type
-            type = Utils.bytearraycopy(RawTransaction, 1, 1)
+            type = util.bytearraycopy(RawTransaction, 1, 1)
             # nonce
-            nonce = Utils.bytearraycopy(RawTransaction, 2, 8)
+            nonce = util.bytearraycopy(RawTransaction, 2, 8)
             # from
-            form = Utils.bytearraycopy(RawTransaction, 10, 32)
+            form = util.bytearraycopy(RawTransaction, 10, 32)
             # gasprice
-            gasprice = Utils.bytearraycopy(RawTransaction, 42, 8)
+            gasprice = util.bytearraycopy(RawTransaction, 42, 8)
             # amount
-            amount = Utils.bytearraycopy(RawTransaction, 50, 8)
+            amount = util.bytearraycopy(RawTransaction, 50, 8)
             # signo
-            signo = Utils.bytearraycopy(RawTransaction, 58, 64)
+            signo = util.bytearraycopy(RawTransaction, 58, 64)
             # to
-            to = Utils.bytearraycopy(RawTransaction, 122, 20)
+            to = util.bytearraycopy(RawTransaction, 122, 20)
             # payloadlen
-            payloadlen = Utils.bytearraycopy(RawTransaction, 142, 4)
+            payloadlen = util.bytearraycopy(RawTransaction, 142, 4)
             # payload
-            payload = Utils.bytearraycopy(RawTransaction, 146, Utils.decodeUint32(payloadlen))
+            payload = util.bytearraycopy(RawTransaction, 146, util.decodeUint32(payloadlen))
             RawTransactionNoSign = version + type + nonce + form + gasprice + amount + signo + to + payloadlen + payload
             RawTransactionNoSig = version + type + nonce + form + gasprice + amount
             # 签名数据
-            sig = Ed25519PrivateKey(privkey).sign(RawTransactionNoSign);
-            transha = Sha3Keccack.keccak256(RawTransactionNoSig + sig + to + payloadlen + payload)
+            ed25519PrivateKey = Ed25519PrivateKey(privkey)
+            sig = ed25519PrivateKey.sign(RawTransactionNoSign)
+            transha = sha3Keccack.keccak256(RawTransactionNoSig + sig + to + payloadlen + payload)
             signRawBasicTransaction = version + transha + type + nonce + form + gasprice + amount + sig + to + payloadlen + payload
             signRawBasicTransactionHex = binascii.b2a_hex(signRawBasicTransaction)
             return signRawBasicTransactionHex.decode()
