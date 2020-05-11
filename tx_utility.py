@@ -76,12 +76,11 @@ class TxUtility:
 
 
 if __name__ == '__main__':
-    fromPubkeyStr = binascii.a2b_hex('e872bbcb080c61608d0260d5b6cc7a73c8b89c446365132197aa84679bddd3d1')
+    fromPubkeyStr = binascii.a2b_hex('7a94e5c3c8bf9bbf23df6d195ff3a76322088a94886f5bfee70ac574d11bd52a')
     toPubkeyHashStr = binascii.a2b_hex('0d5babadfba67318fce816e3ebf27d727808c98f')
     amount = 10 * 100000000
-    prikeyStr = binascii.a2b_hex('fe61c314b09570f2662322fd4c12dcc5c1673682953df1ad4d821ede0e8f06c4')
-    nonce = 11
-    print('1')
+    prikeyStr = binascii.a2b_hex('f0d55ae8a79186e8595514fe23dec8716a191d2bb525998298371693dc69a926')
+    nonce = 2
     a = TxUtility()
     b = a.create_transfer_tx(fromPubkeyStr, toPubkeyHashStr, amount, nonce)
     print('b.sig:' + binascii.b2a_hex(b.sig).decode())
@@ -89,6 +88,6 @@ if __name__ == '__main__':
     print('b.sig:' + binascii.b2a_hex(b.sig).decode())
     print('b.get_raw_for_sign:' + binascii.b2a_hex(b.get_raw_for_sign()).decode())
     print('b.get_hash:' + binascii.b2a_hex(b.get_hash()).decode())
-    print('b.get_raw_for_hash:' + binascii.b2a_hex(b.get_raw_for_hash()).decode())
+    print('b.get_raw_for_hash:' + binascii.b2a_hex(b.get_raw_for_hash()).decode()[0:2] + binascii.b2a_hex(b.get_hash()).decode() + binascii.b2a_hex(b.get_raw_for_hash()).decode()[2:])
 
 
