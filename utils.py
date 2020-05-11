@@ -16,16 +16,22 @@ class Utils:
 
     @staticmethod
     def encode_u64(data: int) -> bytes:
+        if data < 0:
+            raise str(data) + 'is negative'
         r = data.to_bytes(8, 'big')
         return r
 
     @staticmethod
     def encode_u32(data: int) -> bytes:
+        if data < 0:
+            raise str(data) + 'is negative'
         r = data.to_bytes(4, 'big')
         return r
 
     @staticmethod
     def encode_u8(data: int) -> bytes:
+        if data < 0:
+            raise str(data) + 'is negative'
         r = data.to_bytes(1, 'big')
         return r
 
