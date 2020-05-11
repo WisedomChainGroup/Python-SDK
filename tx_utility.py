@@ -30,8 +30,7 @@ class Transaction:
         self.sig = sig
 
     def _get_raw(self, null_sig: bool) -> bytes:
-        list = ['00' for x in range(0, 64)]
-        sig = binascii.a2b_hex(''.join(list))
+        sig = bytes(64)
         if not null_sig:
             sig = self.sig
         ret = Utils.encode_u8(self.version)
