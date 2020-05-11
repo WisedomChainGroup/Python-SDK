@@ -65,18 +65,16 @@ class TxUtility:
         tx.sig = nacl.signing.SigningKey(sk).sign("0".encode("utf8"))[1:]
 
     # 构造交易事务
-    def create_transfer_tx(self, tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int) -> Transaction:
-        tx = Transaction()
-        # 类型：WDC转账
-        tx.tx_type = TRANSFER
-        # Nonce 无符号64位
-        tx.nonce = tx_nonce
-        # 签发者公钥哈希 20字节
-        tx.tx_from = tx_from
-        tx.tx_to = tx_to
+    @staticmethod
+    def create_transfer_tx(tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int) -> Transaction:
+        tx = Transaction(
+            tx_type=TRANSFER,
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_to=tx_to,
+            tx_amount=tx_amount
+        )
         tx.gas_price = round(FEE / GAS_TABLE[TRANSFER])
-        # 转账金额 无符号64位
-        tx.tx_amount = tx_amount
         return tx
 
 
@@ -86,13 +84,12 @@ if __name__ == '__main__':
     amount = 10 * 100000000
     prikeyStr = binascii.a2b_hex('fe61c314b09570f2662322fd4c12dcc5c1673682953df1ad4d821ede0e8f06c4')
     nonce = 11
-    b = TxUtility()
     print('1')
     # a = b.ClientToTransferAccount(fromPubkeyStr, toPubkeyHashStr, amount, prikeyStr, nonce)
-    a = b.create_transfer_tx(fromPubkeyStr, toPubkeyHashStr, amount, nonce)
+    a = TxUtility.create_transfer_tx(fromPubkeyStr, toPubkeyHashStr, amount, nonce)
     print(binascii.b2a_hex(a.get_hash()).decode())
     print(binascii.b2a_hex(a.get_raw_for_sign()).decode())
-    b.sign_transaction(a, prikeyStr)
+    TxUtility.sign_transaction(a, prikeyStr)
     print(a.sig)
     print(binascii.b2a_hex(a.get_raw_for_hash()).decode())
 
