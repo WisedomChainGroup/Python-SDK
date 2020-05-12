@@ -6,12 +6,13 @@ import binascii
 
 class Sha3Keccack:
 
-    def keccak256(self, msg):
-        k = keccak_256()
-        k.update(msg)
-        sks = k.hexdigest()
-        a = binascii.a2b_hex(sks)
-        return a
+    def __init__(self):
+        self.k = keccak_256()
+
+    def calculate_hash(self, value: bytes) -> bytes:
+        self.k.update(value)
+        sk = self.k.hexdigest()
+        return binascii.a2b_hex(sk)
 
 
 if __name__ == '__main__':

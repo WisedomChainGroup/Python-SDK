@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import binascii
+import uuid
 
 
 class Utils:
@@ -35,8 +36,18 @@ class Utils:
         r = data.to_bytes(1, 'big')
         return r
 
+    @staticmethod
+    def prepend(a: bytes, b: bytes) -> bytes:
+        return b + a
+
+    @staticmethod
+    def generate_uuid() -> str:
+        return str(uuid.uuid1())
+
 
 if __name__ == '__main__':
+    ab = Utils()
+    print(ab.prepend(b'', b'1'))
     sks = binascii.a2b_hex("9a90128b52960688cc67ba76a04088aa90525c35abc2282acfa72f6c0eedef5f")
     sk = Utils.byte_array_copy(sks, 142, 4)
     skd = binascii.b2a_hex(Utils.encode_u64(round(100000 / 200000))).decode()

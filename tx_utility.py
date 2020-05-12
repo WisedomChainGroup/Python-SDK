@@ -12,6 +12,7 @@ FEE = 200000
 TRANSFER = 1
 DEFAULT_VERSION = 1
 
+
 class Transaction:
     def __init__(self, tx_from: bytes = b'', gas_price: int = 0, version: int = DEFAULT_VERSION, tx_type: int = 0,
                  tx_nonce: int = 0, tx_amount: int = 0, payload: bytes = b'', tx_to: bytes = b'', sig: bytes = b''):
@@ -49,10 +50,8 @@ class Transaction:
         return self._get_raw(False)
 
     def get_hash(self) -> bytes:
-        k = keccak_256()
-        k.update(self.get_raw_for_hash())
-        sks = k.hexdigest()
-        return binascii.a2b_hex(sks)
+        sha = Sha3Keccack()
+        return sha.calculate_hash(self.get_raw_for_hash())
 
 
 class TxUtility:
@@ -88,6 +87,5 @@ if __name__ == '__main__':
     print('b.sig:' + binascii.b2a_hex(b.sig).decode())
     print('b.get_raw_for_sign:' + binascii.b2a_hex(b.get_raw_for_sign()).decode())
     print('b.get_hash:' + binascii.b2a_hex(b.get_hash()).decode())
-    print('b.get_raw_for_hash:' + binascii.b2a_hex(b.get_raw_for_hash()).decode()[0:2] + binascii.b2a_hex(b.get_hash()).decode() + binascii.b2a_hex(b.get_raw_for_hash()).decode()[2:])
-
-
+    print('b.get_raw_for_hash:' + binascii.b2a_hex(b.get_raw_for_hash()).decode()[0:2] + binascii.b2a_hex(
+        b.get_hash()).decode() + binascii.b2a_hex(b.get_raw_for_hash()).decode()[2:])
