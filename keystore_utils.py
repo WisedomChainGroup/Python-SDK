@@ -4,14 +4,19 @@ from _pysha3 import keccak_256
 from utils import Utils
 from sha3_keccak import Sha3Keccack
 from base58_check import Base58Check
+from Crypto.Hash import RIPEMD160
 
 
 class KeystoreUtils:
 
     @staticmethod
     def pubkey_to_address(pubkey: bytes) -> str:
-        r = s[start:count + start]
-        return r
+        sha = Sha3Keccack()
+        pub256 = sha.CalculateHash(pubkey)
+        h = RIPEMD160.new()
+        h.update(pub256)
+        r1 = h.hexdigest()
+        return pubkey_hash_to_address(r1)
 
     @staticmethod
     def pubkey_hash_to_address(public_hash: bytes) -> str:
