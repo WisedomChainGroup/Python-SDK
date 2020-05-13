@@ -28,6 +28,6 @@ if __name__ == '__main__':
     argon2id = Argon2Manager().hash(p.encode(), salt)
     print(pk)
     print(argon2id)
-    aes = AesManager().ecrypt_data(binascii.a2b_hex(pk), binascii.a2b_hex(argon2id), binascii.a2b_hex(iv))
+    aes = AesManager().encrypt_data(binascii.a2b_hex(pk), binascii.a2b_hex(argon2id), binascii.a2b_hex(iv))
     print(aes)
 
