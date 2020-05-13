@@ -21,7 +21,7 @@ class Crypto:
         self.cipher_params = cipher_params
 
 
-class Keystore:
+class KeyStore:
     def __init__(self, address: str = '', id: str = '', version: str = '2', mac: str = '', kdf: str = 'argon2id'):
         self.address = address
         self.crypto = Crypto()
@@ -33,11 +33,11 @@ class Keystore:
 
 
 class KeyPair:
-    def generateEd25519KeyPair(self):
-        key = Fernet.generate_key()
-        f = Fernet(key)
-        token = f.encrypt(b"A really secret message. Not for prying eyes.")
-        return token
+    def __init__(self):
+        self.seed = random(nacl.bindings.crypto_sign_SEEDBYTES)
+        self.secret_key = binascii.b2a_hex(self.seed)
+        self.public, self.signing_key = nacl.bindings.crypto_sign_seed_keypair(self.seed)
+        self.public_key = binascii.b2a_hex(self.public)
 
 
 if __name__ == '__main__':
@@ -46,15 +46,7 @@ if __name__ == '__main__':
     verify_key = signing_key.verify_key
     print(signing_key)
     print(verify_key)
+    print(binascii.b2a_hex(seed))
     public_key, secret_key = nacl.bindings.crypto_sign_seed_keypair(seed)
-    # signing_key1 = nacl.signing.SigningKey(seed, encoder=nacl.encoding.HexEncoder)
-    print(seed)
-    print(secret_key)
-    signing_key1 = binascii.unhexlify(secret_key) # binascii.hexlify(secret_key)
-    print(b'signing_key1:' + signing_key1)
-    # print(len(public_key), type(public_key), public_key, len(secret_key), type(secret_key), secret_key)
-    hex_key = public_key.encode(encoder=nacl.encoding.HexEncoder)
-    print('hex_key:' + hex_key)
-
-    #a = KeyPair()
-    #print(a.generateEd25519KeyPair())
+    print(binascii.b2a_hex(public_key))
+    print(binascii.b2a_hex(secret_key))

@@ -1,43 +1,48 @@
 #!/usr/bin/python3
 
 from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
-import pyaes
-import pbkdf2
-import secrets
+from Crypto.Util import Counter
 import os
 import binascii
-import pyscrypt
 
 MODEL = AES.MODE_CTR
 
 
 class AesManager:
+    @staticmethod
+    def int_of_string(s):
+        return int(binascii.hexlify(s), 16)
 
     @staticmethod
     def ecrypt_data(plain: bytes, key: bytes, iv: bytes) -> bytes:
-        aes = pyaes.AESModeOfOperationCTR(key)
-        ciphertext = aes.encrypt(plain)
-        return ciphertext
+        ctr = Counter.new(128, initial_value=AesManager().int_of_string(iv))
+        aes = AES.new(key, AES.MODE_CTR, counter=ctr)
+        result = aes.encrypt(plain)
+        return binascii.b2a_hex(result)
 
     @staticmethod
     def decrypt_data(encrypted: bytes, key: bytes, iv: bytes) -> bytes:
-        aes = pyaes.AESModeOfOperationCTR(key)
-        plain = aes.decrypt(encrypted)
-        return plain
+        ctr = Counter.new(128, initial_value=AesManager().int_of_string(iv))
+        aes = AES.new(key, AES.MODE_CTR, counter=ctr)
+        result = aes.decrypt(encrypted)
+        return result
+
 
 if __name__ == '__main__':
-    a = AesManager()
-    pk = '69bc24521d3958a965c1138900cd9e151870c046cbb89fdbe20b81750f143be7'
-    iv = '4ed36217f5c2e65dc1b35591e8208763'
-    salt = 'b3ae9b3baa1f2fe9cb06f5573a770c17b611a1751e1245e7563efaad8899222d'
-    password = "22222222"
-    hashed = pyscrypt.hash(password=b"22222222", salt=b'b3ae9b3baa1f2fe9cb06f5573a770c17b611a1751e1245e7563efaad8899222d', N=1024, r=1, p=1, dkLen=32)
-    print(binascii.b2a_hex(hashed).decode())
-    print(pbkdf2.crypt(b"22222222"))
-    derived_key = pbkdf2.PBKDF2(password, salt).read(32)
-    print("derived_key:", binascii.b2a_hex(derived_key).decode())
-    cipher_privKey = a.ecrypt_data(pk, derived_key, iv)
-    print("cipher_privKey:", binascii.b2a_hex(cipher_privKey).decode())
+    i = b"59140a7f3e19e8b94a11dd0951c6c35c"
+    pk = b"89c8181609a202ca4ee15d6602bb3adb0cae164f8f38e547b4240d0a01b84bd5"
+    print(binascii.a2b_hex(i))
+    a = int(binascii.hexlify(binascii.a2b_hex(i)), 16)
+    print(a, type(a))
+    counter = Counter.new(128, initial_value=a)
+    print(counter)
+    k = binascii.a2b_hex(b"7cfc6d1f2444a9aba9da9d5e3cdc3d7e7901222d9bb4a79b7a2f027721ce4c04")
+    crypto = AES.new(k, AES.MODE_CTR, counter=counter)
+    ex = binascii.a2b_hex(pk)
+    plains = crypto.encrypt(ex)
+    print(binascii.b2a_hex(plains))
+    aesmanager = AesManager()
+    print(aesmanager.ecrypt_data(ex, k, binascii.a2b_hex(i)))
+
 
 
