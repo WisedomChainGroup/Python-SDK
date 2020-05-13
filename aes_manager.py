@@ -6,6 +6,8 @@ import pyaes
 import pbkdf2
 import secrets
 import os
+import binascii
+import pyscrypt
 
 MODEL = AES.MODE_CTR
 
@@ -14,30 +16,28 @@ class AesManager:
 
     @staticmethod
     def ecrypt_data(plain: bytes, key: bytes, iv: bytes) -> bytes:
-        aes = pyaes.AESModeOfOperationCTR(key, iv)
+        aes = pyaes.AESModeOfOperationCTR(key)
         ciphertext = aes.encrypt(plain)
         return ciphertext
 
     @staticmethod
     def decrypt_data(encrypted: bytes, key: bytes, iv: bytes) -> bytes:
-        aes = pyaes.AESModeOfOperationCTR(key, iv)
+        aes = pyaes.AESModeOfOperationCTR(key)
         plain = aes.decrypt(encrypted)
         return plain
 
 if __name__ == '__main__':
     a = AesManager()
-    data = b"f0cc186d01693a20b0540cc31bd792afee8c5231a6372cc37c3a6428247a0452"
-    password = "00000000"
-    passwordSalt = os.urandom(16)
-    key = pbkdf2.PBKDF2(password, passwordSalt).read(32)
-    iv = b'd78c79f302847de4e8b62f0ef087f6aa'
-    iv1 = secrets.randbits(256)
-    iv2 = pyaes.Counter(iv)
-    print("iv1:", iv1)
-    print("iv2:", iv2)
-    print("key:", key)
-    e = a.ecrypt_data(data, key, iv)  # 加密
-    print("加密:", e)
-    d = a.decrypt_data(e, b'9999999999999999', b'qqqqqqqqqqqqqqqq')  # 解密
-    print("解密:", d)
+    pk = '69bc24521d3958a965c1138900cd9e151870c046cbb89fdbe20b81750f143be7'
+    iv = '4ed36217f5c2e65dc1b35591e8208763'
+    salt = 'b3ae9b3baa1f2fe9cb06f5573a770c17b611a1751e1245e7563efaad8899222d'
+    password = "22222222"
+    hashed = pyscrypt.hash(password=b"22222222", salt=b'b3ae9b3baa1f2fe9cb06f5573a770c17b611a1751e1245e7563efaad8899222d', N=1024, r=1, p=1, dkLen=32)
+    print(binascii.b2a_hex(hashed).decode())
+    print(pbkdf2.crypt(b"22222222"))
+    derived_key = pbkdf2.PBKDF2(password, salt).read(32)
+    print("derived_key:", binascii.b2a_hex(derived_key).decode())
+    cipher_privKey = a.ecrypt_data(pk, derived_key, iv)
+    print("cipher_privKey:", binascii.b2a_hex(cipher_privKey).decode())
+
 

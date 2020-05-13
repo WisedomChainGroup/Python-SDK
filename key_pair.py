@@ -22,7 +22,7 @@ class Crypto:
 
 
 class Keystore:
-    def __init__(self, address: str = '', id: str = '', version: str = '', mac: str = '', kdf: str = ''):
+    def __init__(self, address: str = '', id: str = '', version: str = '2', mac: str = '', kdf: str = 'argon2id'):
         self.address = address
         self.crypto = Crypto()
         self.id = id
