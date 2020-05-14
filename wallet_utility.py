@@ -1,31 +1,6 @@
 #!/usr/bin/python3
 
-from key_store import KeyStore, KeyPair, Crypto, KdfParams
-from utils import Utils
-import secrets
-import binascii
-
-MEMORYCOST = 20480
-TIMECOST = 4
-PARALLELIS = 2
-CIPHER = "aes-256-ctr"
-
-
-class WalletUtility:
-    @staticmethod
-    def from_password(password: str):
-
-        sk, pk = Utils.ed25519_keypair()
-        salt = secrets.token_bytes(32)
-        iv = secrets.token_bytes(16)
-        argon2id = Utils.argon2_hash(salt + password.encode(), salt, TIMECOST, MEMORYCOST, PARALLELIS)
-        address = Utils.pubkey_to_address(pk)
-        aes = Utils.encrypt_data(sk, argon2id, iv)
-        mac = binascii.b2a_hex(Utils.keccak256(argon2id + aes)).decode()
-        key_store = KeyStore(address=address, id=Utils.generate_uuid(), mac=mac)
-        key_store.crypto = Crypto(CIPHER, aes, iv)
-        key_store.kdf_params = KdfParams(MEMORYCOST, TIMECOST, PARALLELIS, iv)
-        return key_store
+from key_store import KeyStore
 
 
 if __name__ == '__main__':
@@ -48,5 +23,4 @@ if __name__ == '__main__':
     # print('aes:' + aes.decode())
     # print('mac:' + mac)
     # print(json.dumps(key_store.__dict__))
-    print(WalletUtility().from_password("00000000"))
-
+    print(KeyStore.from_password("00000000").as_dict())

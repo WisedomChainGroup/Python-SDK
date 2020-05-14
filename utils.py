@@ -166,7 +166,7 @@ class Utils:
         ctr = Counter.new(128, initial_value=Utils.__int_of_string(iv))
         aes = AES.new(key, AES.MODE_CTR, counter=ctr)
         result = aes.encrypt(plain)
-        return binascii.b2a_hex(result)
+        return result
 
     @staticmethod
     def decrypt_data(encrypted: bytes, key: bytes, iv: bytes) -> bytes:
@@ -186,6 +186,10 @@ class Utils:
             seed = random(nacl.bindings.crypto_sign_SEEDBYTES)
         public, _ = nacl.bindings.crypto_sign_seed_keypair(seed)
         return seed, public
+
+    @staticmethod
+    def random_bytes(length: int) -> bytes:
+        return random(length)
 
 
 if __name__ == '__main__':
