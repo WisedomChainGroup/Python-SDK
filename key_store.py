@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 from typing import Tuple
-
+from utils import Utils
+from nacl.utils import random
 import nacl.bindings
 import nacl.signing
-from nacl.utils import random
+import json
 
-from utils import Utils
 
 
 class CipherParams:
@@ -19,6 +19,15 @@ class KdfParams:
         self.time_cost = time_cost
         self.parallelism = parallelism
         self.salt = salt
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        ret = cls()
+        ret.memory_cost = d['memoryCost']
+        ret.time_cost = d['timeCost']
+        ret.parallelism = d['parallelism']
+        ret.salt = bytes.fromhex(d['salt'])
+        return ret
 
     def as_dict(self) -> dict:
         return {
@@ -34,6 +43,17 @@ class Crypto:
         self.cipher = cipher
         self.cipher_text = cipher_text
         self.cipher_params = CipherParams(iv)
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        ret = cls()
+        ret.cipher = d['cipher']
+        if ret.cipher.lower() != 'aes-256-ctr':
+            raise ret.cipher + " not supported"
+        ret.cipher_text = bytes.fromhex(d['ciphertext'])
+        ret.cipher_params = CipherParams()
+        ret.cipher_params.iv = bytes.fromhex(d['cipherparams']['iv'])
+        return ret
 
     def as_dict(self) -> dict:
         return {
@@ -69,15 +89,20 @@ class KeyStore:
         }
 
     @classmethod
-    def createKeyStore(cls, password: str):
-        return cls()
-
-    @classmethod
     def fromJson(cls, data: str):
-        return cls()
+        d = json.loads(data)
+        a = cls()
+        a.address = d["address"]
+        a.id = d["id"]
+        a.version = d["version"]
+        a.mac = bytes.fromhex(d["mac"])
+        a.kdf = d["kdf"]
+        a.crypto = Crypto().from_dict(d["crypto"])
+        a.kdf_params = KdfParams().from_dict(d["kdfparams"])
+        return a
 
     @classmethod
-    def from_password(cls, password: str):
+    def createKeyStore(cls, password: str):
         sk, pk = Utils.ed25519_keypair()
         salt = Utils.random_bytes(32)
         iv = Utils.random_bytes(16)
@@ -87,7 +112,7 @@ class KeyStore:
         mac = Utils.keccak256(argon_hash + aes)
         key_store = KeyStore(address=address, id=Utils.generate_uuid(), mac=mac)
         key_store.crypto = Crypto(cipher_text=aes, iv=iv)
-        key_store.kdf_params = KdfParams()
+        key_store.kdf_params = KdfParams(salt = salt)
         return key_store
 
 
@@ -102,15 +127,6 @@ class KeyPair:
 
 
 if __name__ == '__main__':
-    # seed = random(nacl.bindings.crypto_sign_SEEDBYTES)
-    # signing_key = nacl.signing.SigningKey.generate()
-    # verify_key = signing_key.verify_key
-    # print(signing_key )
-    # print(verify_key)
-    # print(binascii.b2a_hex(seed))
-    # public_key, secret_key = nacl.bindings.crypto_sign_seed_keypair(seed)
-    # print(binascii.b2a_hex(public_key))
-    # print(binascii.b2a_hex(secret_key))
-    s, p = KeyPair.get_key()
-    print(s, p)
-    KeyStore.createKeyStore("")
+    print(KeyStore.createKeyStore("00000000").as_dict())
+    a = """{"address":"WX12t3nAs9FshfT1jsWNvGJEZq7UBD1ym2Ei","kdfparams":{"salt":"ec3932e9c96483ad99d752de8aa15f5bc57a3ee15e7165ce66aa14df699098d7","memoryCost":20480,"parallelism":2,"timeCost":4},"id":"377b4eae-32d8-4b7f-a475-2ecaae162ec4","kdf":"argon2id","version":"2","mac":"be8e52b318ee69ed3ab4e88719da3cde9c46f883dca5a134b6580ededd036b99","crypto":{"cipher":"aes-256-ctr","ciphertext":"12dfd5e07430afbb50c60317a531376b869b5cfa2f5eb33f480d14fded8b9606","cipherparams":{"iv":"bfc8af56f4e701ecfaddb0c06f7bc915"}}}"""
+    print(json.dumps(KeyStore.fromJson(a).as_dict()))
