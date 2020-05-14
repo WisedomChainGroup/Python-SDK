@@ -15,7 +15,7 @@ CIPHER = "aes-256-ctr"
 class WalletUtility:
     @staticmethod
     def from_password(password: str):
-        sk, pk = KeyPair().get_key()
+        sk, pk = Utils.ed25519_keypair()
         salt = binascii.b2a_hex(secrets.token_bytes(32))
         iv = binascii.b2a_hex(secrets.token_bytes(16))
         argon2id = Utils.argon2_hash(salt + password.encode(), salt, TIMECOST, MEMORYCOST, PARALLELIS)

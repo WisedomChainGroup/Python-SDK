@@ -1,20 +1,20 @@
 #!/usr/bin/python3
 
+import binascii
 import uuid
+from typing import Tuple
 
 import argon2
 import base58
+import nacl.bindings
+from Crypto.Cipher import AES
 from Crypto.Hash import RIPEMD160
 from Crypto.Hash import keccak
-from Crypto.Cipher import AES
 from Crypto.Util import Counter
-from typing import Tuple
 from nacl.utils import random
-import nacl.bindings
-
-import binascii
 
 MODEL = AES.MODE_CTR
+
 
 class Utils:
     @staticmethod
@@ -147,11 +147,12 @@ class Utils:
         return result
 
     @staticmethod
-    def ed25519_keypair() -> Tuple[bytes, bytes]:
-        seed = random(nacl.bindings.crypto_sign_SEEDBYTES)
-        secret_key = seed
+    def ed25519_keypair(seed: bytes = b'') -> Tuple[bytes, bytes]:
+        if len(seed) == 0:
+            seed = random(nacl.bindings.crypto_sign_SEEDBYTES)
         public, _ = nacl.bindings.crypto_sign_seed_keypair(seed)
-        return secret_key, public
+        return seed, public
+
 
 if __name__ == '__main__':
     sks = bytes.fromhex("9a90128b52960688cc67ba76a04088aa90525c35abc2282acfa72f6c0eedef5f")

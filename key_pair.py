@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 from typing import Tuple
-import nacl.signing
+
 import nacl.bindings
+import nacl.signing
 from nacl.utils import random
 
 
@@ -35,6 +36,10 @@ class KeyStore:
         self.kdf = kdf
         self.kdf_params = KdfParams()
 
+    @classmethod
+    def createKeyStore(cls, password: str) :
+        return cls()
+
 
 class KeyPair:
 
@@ -58,3 +63,4 @@ if __name__ == '__main__':
     # print(binascii.b2a_hex(secret_key))
     s, p = KeyPair.get_key()
     print(s, p)
+    KeyStore.createKeyStore("")
