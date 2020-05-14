@@ -7,12 +7,12 @@ from nacl.utils import random
 
 
 class CipherParams:
-    def __init__(self, iv: str = ''):
+    def __init__(self, iv: bytes = b''):
         self.iv = iv
 
 
 class KdfParams:
-    def __init__(self, memory_cost: int = 0, time_cost: int = 0, parallelism: int = 0, salt: str = ''):
+    def __init__(self, memory_cost: int = 0, time_cost: int = 0, parallelism: int = 0, salt: bytes = b''):
         self.memory_cost = memory_cost
         self.time_cost = time_cost
         self.parallelism = parallelism
@@ -20,10 +20,10 @@ class KdfParams:
 
 
 class Crypto:
-    def __init__(self, cipher: str = '', cipher_text: str = '', iv: str = ''):
+    def __init__(self, cipher: str = '', cipher_text: bytes = b'', iv: bytes = b''):
         self.cipher = cipher
         self.cipher_text = cipher_text
-        self.cipher_params = CipherParams(iv).__dict__
+        self.cipher_params = CipherParams(iv)
 
 
 class KeyStore:
