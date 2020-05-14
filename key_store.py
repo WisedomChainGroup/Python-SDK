@@ -36,10 +36,19 @@ class KeyStore:
         self.kdf = kdf
         self.kdf_params = KdfParams()
 
+    def parse(self, password: str) -> bytes:
+        pass
+
+    def getJson(self) -> str:
+        pass
+    
     @classmethod
     def createKeyStore(cls, password: str) :
         return cls()
 
+    @classmethod
+    def fromJson(cls, data: str) :
+        return cls()
 
 class KeyPair:
 
