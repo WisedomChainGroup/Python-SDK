@@ -2,8 +2,7 @@
 from typing import Tuple
 import nacl.signing
 import nacl.bindings
-from nacl.utils import StringFixer, random
-import binascii
+from nacl.utils import random
 
 
 class CipherParams:
@@ -42,10 +41,9 @@ class KeyPair:
     @staticmethod
     def get_key() -> Tuple[bytes, bytes]:
         seed = random(nacl.bindings.crypto_sign_SEEDBYTES)
-        secret_key = binascii.b2a_hex(seed)
-        public, signing_key = nacl.bindings.crypto_sign_seed_keypair(seed)
-        public_key = binascii.b2a_hex(public)
-        return secret_key, public_key
+        secret_key = seed
+        public, _ = nacl.bindings.crypto_sign_seed_keypair(seed)
+        return secret_key, public
 
 
 if __name__ == '__main__':
