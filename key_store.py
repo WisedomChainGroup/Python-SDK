@@ -1,11 +1,12 @@
 #!/usr/bin/python3
+import json
 from typing import Tuple
-from utils import Utils
-from nacl.utils import random
+
 import nacl.bindings
 import nacl.signing
-import json
+from nacl.utils import random
 
+from utils import Utils
 
 
 class CipherParams:
@@ -89,20 +90,24 @@ class KeyStore:
         }
 
     @classmethod
-    def fromJson(cls, data: str):
-        d = json.loads(data)
+    def from_dict(cls, d: dict):
         a = cls()
         a.address = d["address"]
         a.id = d["id"]
         a.version = d["version"]
         a.mac = bytes.fromhex(d["mac"])
         a.kdf = d["kdf"]
-        a.crypto = Crypto().from_dict(d["crypto"])
-        a.kdf_params = KdfParams().from_dict(d["kdfparams"])
+        a.crypto = Crypto.from_dict(d["crypto"])
+        a.kdf_params = KdfParams.from_dict(d["kdfparams"])
         return a
 
     @classmethod
-    def createKeyStore(cls, password: str):
+    def from_json(cls, data: str):
+        d = json.loads(data)
+        return cls.from_dict(d)
+
+    @classmethod
+    def create_key_store(cls, password: str):
         sk, pk = Utils.ed25519_keypair()
         salt = Utils.random_bytes(32)
         iv = Utils.random_bytes(16)
@@ -112,7 +117,7 @@ class KeyStore:
         mac = Utils.keccak256(argon_hash + aes)
         key_store = KeyStore(address=address, id=Utils.generate_uuid(), mac=mac)
         key_store.crypto = Crypto(cipher_text=aes, iv=iv)
-        key_store.kdf_params = KdfParams(salt = salt)
+        key_store.kdf_params = KdfParams(salt=salt)
         return key_store
 
 
@@ -127,6 +132,27 @@ class KeyPair:
 
 
 if __name__ == '__main__':
-    print(KeyStore.createKeyStore("00000000").as_dict())
-    a = """{"address":"WX12t3nAs9FshfT1jsWNvGJEZq7UBD1ym2Ei","kdfparams":{"salt":"ec3932e9c96483ad99d752de8aa15f5bc57a3ee15e7165ce66aa14df699098d7","memoryCost":20480,"parallelism":2,"timeCost":4},"id":"377b4eae-32d8-4b7f-a475-2ecaae162ec4","kdf":"argon2id","version":"2","mac":"be8e52b318ee69ed3ab4e88719da3cde9c46f883dca5a134b6580ededd036b99","crypto":{"cipher":"aes-256-ctr","ciphertext":"12dfd5e07430afbb50c60317a531376b869b5cfa2f5eb33f480d14fded8b9606","cipherparams":{"iv":"bfc8af56f4e701ecfaddb0c06f7bc915"}}}"""
-    print(json.dumps(KeyStore.fromJson(a).as_dict()))
+    print(KeyStore.create_key_store("00000000").as_dict())
+    a = """
+{
+    "address": "WX12t3nAs9FshfT1jsWNvGJEZq7UBD1ym2Ei",
+    "kdfparams": {
+        "salt": "ec3932e9c96483ad99d752de8aa15f5bc57a3ee15e7165ce66aa14df699098d7",
+        "memoryCost": 20480,
+        "parallelism": 2,
+        "timeCost": 4
+    },
+    "id": "377b4eae-32d8-4b7f-a475-2ecaae162ec4",
+    "kdf": "argon2id",
+    "version": "2",
+    "mac": "be8e52b318ee69ed3ab4e88719da3cde9c46f883dca5a134b6580ededd036b99",
+    "crypto": {
+        "cipher": "aes-256-ctr",
+        "ciphertext": "12dfd5e07430afbb50c60317a531376b869b5cfa2f5eb33f480d14fded8b9606",
+        "cipherparams": {
+            "iv": "bfc8af56f4e701ecfaddb0c06f7bc915"
+        }
+    }
+}    
+    """
+    print(json.dumps(KeyStore.from_json(a).as_dict()))
