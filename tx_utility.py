@@ -1,11 +1,8 @@
 #!/usr/bin/python3
 
 from utils import Utils
-from ed25519 import Ed25519PrivateKey
-from sha3_keccak import Sha3Keccack
 import binascii
 import nacl.signing
-from _pysha3 import keccak_256
 
 GAS_TABLE = [0, 50000]
 FEE = 200000
@@ -50,8 +47,7 @@ class Transaction:
         return self._get_raw(False)
 
     def get_hash(self) -> bytes:
-        sha = Sha3Keccack()
-        return sha.calculate_hash(self.get_raw_for_hash())
+        return Utils.keccak256(self.get_raw_for_hash())
 
 
 class TxUtility:

@@ -1,28 +1,28 @@
 #!/usr/bin/python3
 
+import binascii
+
 from Crypto.Cipher import AES
 from Crypto.Util import Counter
-import os
-import binascii
 
 MODEL = AES.MODE_CTR
 
 
 class AesManager:
     @staticmethod
-    def int_of_string(s):
+    def __int_of_string(s):
         return int(binascii.hexlify(s), 16)
 
     @staticmethod
     def encrypt_data(plain: bytes, key: bytes, iv: bytes) -> bytes:
-        ctr = Counter.new(128, initial_value=AesManager().int_of_string(iv))
+        ctr = Counter.new(128, initial_value=AesManager.__int_of_string(iv))
         aes = AES.new(key, AES.MODE_CTR, counter=ctr)
         result = aes.encrypt(plain)
         return binascii.b2a_hex(result)
 
     @staticmethod
     def decrypt_data(encrypted: bytes, key: bytes, iv: bytes) -> bytes:
-        ctr = Counter.new(128, initial_value=AesManager().int_of_string(iv))
+        ctr = Counter.new(128, initial_value=AesManager.__int_of_string(iv))
         aes = AES.new(key, AES.MODE_CTR, counter=ctr)
         result = aes.decrypt(encrypted)
         return result
@@ -41,8 +41,4 @@ if __name__ == '__main__':
     ex = binascii.a2b_hex(pk)
     plains = crypto.encrypt(ex)
     print(binascii.b2a_hex(plains))
-    manager = AesManager()
-    print(manager.encrypt_data(ex, k, binascii.a2b_hex(i)))
-
-
-
+    print(AesManager.encrypt_data(ex, k, binascii.a2b_hex(i)))

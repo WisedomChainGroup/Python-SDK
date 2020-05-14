@@ -1,10 +1,6 @@
 #!/usr/bin/python3
 
-from key_pair import KeyStore, KeyPair, Crypto, KdfParams, CipherParams
-from argon2_manager import Argon2Manager
-from aes_manager import AesManager
-from keystore_utils import KeystoreUtils
-from sha3_keccak import Sha3Keccack
+from key_pair import KeyStore, KeyPair, Crypto, KdfParams
 from utils import Utils
 import secrets
 import binascii
@@ -22,10 +18,10 @@ class WalletUtility:
         sk, pk = KeyPair().get_key()
         salt = binascii.b2a_hex(secrets.token_bytes(32))
         iv = binascii.b2a_hex(secrets.token_bytes(16))
-        argon2id = Argon2Manager().hash(password.encode(), salt, TIMECOST, MEMORYCOST, PARALLELIS)
-        address = KeystoreUtils().pubkey_to_address(pk)
-        aes = AesManager().encrypt_data(binascii.a2b_hex(sk), binascii.a2b_hex(argon2id), binascii.a2b_hex(iv))
-        mac = binascii.b2a_hex(Sha3Keccack().calculate_hash(argon2id + aes)).decode()
+        argon2id = Utils.argon2_hash(salt + password.encode(), salt, TIMECOST, MEMORYCOST, PARALLELIS)
+        address = Utils.pubkey_to_address(pk)
+        aes = Utils.encrypt_data(binascii.a2b_hex(sk), binascii.a2b_hex(argon2id), binascii.a2b_hex(iv))
+        mac = binascii.b2a_hex(Utils.keccak256(argon2id + aes)).decode()
         key_store = KeyStore(address=address, id=Utils.generate_uuid(), mac=mac)
         key_store.crypto = Crypto(CIPHER, aes.decode(), iv.decode()).__dict__
         key_store.kdf_params = KdfParams(MEMORYCOST, TIMECOST, PARALLELIS, iv.decode()).__dict__
