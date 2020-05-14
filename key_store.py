@@ -112,8 +112,8 @@ class KeyStore:
         return cls.from_dict(d)
 
     @classmethod
-    def create_key_store(cls, password: str):
-        sk, pk = Utils.ed25519_keypair()
+    def create_key_store(cls, password: str, sk: bytes = b''):
+        sk, pk = Utils.ed25519_keypair(sk)
         salt = Utils.random_bytes(32)
         iv = Utils.random_bytes(16)
         argon_hash = Utils.argon2_hash(associated_data=salt + password.encode(), salt=salt)
@@ -160,6 +160,7 @@ if __name__ == '__main__':
 }    
     """
     b = KeyStore.create_key_store("00000000")
-    print(KeyStore.parse(b, "00000000"))
+    print(b.parse("00000000").hex())
     print(json.dumps(KeyStore.from_json(a).as_dict()))
     keystore = KeyStore.from_json(a)
+    print(keystore.parse("00000000").hex())
