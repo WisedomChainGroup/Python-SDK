@@ -33,7 +33,7 @@ class Utils:
         :return: encode as 64 bit big endian bytes
         """
         if data < 0:
-            raise str(data) + 'is negative'
+            raise BaseException(str(data) + 'is negative')
         r = data.to_bytes(8, 'big')
         return r
 
@@ -44,7 +44,7 @@ class Utils:
         :return: encode as 32 bit big endian bytes
         """
         if data < 0:
-            raise str(data) + 'is negative'
+            raise BaseException(str(data) + 'is negative')
         r = data.to_bytes(4, 'big')
         return r
 
@@ -55,7 +55,7 @@ class Utils:
         :return: encode as 8 bit big endian bytes
         """
         if data < 0:
-            raise str(data) + 'is negative'
+            raise BaseException(str(data) + 'is negative')
         r = data.to_bytes(1, 'big')
         return r
 
@@ -138,7 +138,7 @@ class Utils:
         r1 = r2[1:]
         r3 = Utils.keccak256(Utils.keccak256(r1))
         if r3[0:4] != b4:
-            raise 'invalid address ' + address + ' verify failed'
+            raise BaseException('invalid address ' + address + ' verify failed')
         return r1
 
 
