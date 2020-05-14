@@ -50,7 +50,7 @@ class Crypto:
         ret = cls()
         ret.cipher = d['cipher']
         if ret.cipher.lower() != 'aes-256-ctr':
-            raise ret.cipher + " not supported"
+            raise BaseException('cipher %s not supported, please use aes-256-ctr' % ret.cipher)
         ret.cipher_text = bytes.fromhex(d['ciphertext'])
         ret.cipher_params = CipherParams()
         ret.cipher_params.iv = bytes.fromhex(d['cipherparams']['iv'])
@@ -88,7 +88,8 @@ class KeyStore:
             "version": self.version,
             "mac": self.mac.hex(),
             "kdfparams": self.kdf_params.as_dict(),
-            "crypto": self.crypto.as_dict()
+            "crypto": self.crypto.as_dict(),
+            "kdf": self.kdf
         }
 
     @classmethod
@@ -99,6 +100,8 @@ class KeyStore:
         a.version = d["version"]
         a.mac = bytes.fromhex(d["mac"])
         a.kdf = d["kdf"]
+        if a.kdf.lower() != 'argon2id':
+            raise BaseException('kdf %s is not supported, please use argon2id ' % a.kdf)
         a.crypto = Crypto.from_dict(d["crypto"])
         a.kdf_params = KdfParams.from_dict(d["kdfparams"])
         return a

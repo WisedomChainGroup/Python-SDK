@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from utils import Utils
-import binascii
 import nacl.signing
 
 GAS_TABLE = [0, 50000]
