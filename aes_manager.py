@@ -14,7 +14,7 @@ class AesManager:
         return int(binascii.hexlify(s), 16)
 
     @staticmethod
-    def ecrypt_data(plain: bytes, key: bytes, iv: bytes) -> bytes:
+    def encrypt_data(plain: bytes, key: bytes, iv: bytes) -> bytes:
         ctr = Counter.new(128, initial_value=AesManager().int_of_string(iv))
         aes = AES.new(key, AES.MODE_CTR, counter=ctr)
         result = aes.encrypt(plain)
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     plains = crypto.encrypt(ex)
     print(binascii.b2a_hex(plains))
     aesmanager = AesManager()
-    print(aesmanager.ecrypt_data(ex, k, binascii.a2b_hex(i)))
+    print(aesmanager.encrypt_data(ex, k, binascii.a2b_hex(i)))
 
 
 

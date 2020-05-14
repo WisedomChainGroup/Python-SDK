@@ -24,7 +24,7 @@ class WalletUtility:
         iv = binascii.b2a_hex(secrets.token_bytes(16))
         argon2id = Argon2Manager().hash(password.encode(), salt, TIMECOST, MEMORYCOST, PARALLELIS)
         address = KeystoreUtils().pubkey_to_address(pk)
-        aes = AesManager().ecrypt_data(binascii.a2b_hex(sk), binascii.a2b_hex(argon2id), binascii.a2b_hex(iv))
+        aes = AesManager().encrypt_data(binascii.a2b_hex(sk), binascii.a2b_hex(argon2id), binascii.a2b_hex(iv))
         mac = binascii.b2a_hex(Sha3Keccack().calculate_hash(argon2id + aes)).decode()
         key_store = KeyStore(address=address, id=Utils.generate_uuid(), mac=mac)
         key_store.crypto = Crypto(CIPHER, aes.decode(), v.decode()).__dict__
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     v = binascii.b2a_hex(secrets.token_bytes(16))
     argon2id = Argon2Manager().hash(ps.encode(), sa, TIMECOST, MEMORYCOST, PARALLELIS)
     address = KeystoreUtils().pubkey_to_address(p)
-    aes = AesManager().ecrypt_data(binascii.a2b_hex(s), binascii.a2b_hex(argon2id), binascii.a2b_hex(v))
+    aes = AesManager().encrypt_data(binascii.a2b_hex(s), binascii.a2b_hex(argon2id), binascii.a2b_hex(v))
     mac = binascii.b2a_hex(Sha3Keccack().calculate_hash(argon2id + aes)).decode()
     key_store.address = address
     key_store.crypto = Crypto(CIPHER, aes.decode(), v.decode()).__dict__
