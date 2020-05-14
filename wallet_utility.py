@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from key_pair import KeyStore, KeyPair, Crypto, KdfParams
+from key_store import KeyStore, KeyPair, Crypto, KdfParams
 from utils import Utils
 import secrets
 import binascii
