@@ -41,8 +41,8 @@ if __name__ == '__main__':
     ex = binascii.a2b_hex(pk)
     plains = crypto.encrypt(ex)
     print(binascii.b2a_hex(plains))
-    aesmanager = AesManager()
-    print(aesmanager.encrypt_data(ex, k, binascii.a2b_hex(i)))
+    manager = AesManager()
+    print(manager.encrypt_data(ex, k, binascii.a2b_hex(i)))
 
 
 

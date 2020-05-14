@@ -33,5 +33,5 @@ class KeystoreUtils:
 if __name__ == '__main__':
     a = KeystoreUtils()
     pub_key = b"9283f26b45adb774d29106c59faa6de5209ebad5278920fc26ed8d76e4c5e340"
-    adress = a.pubkey_to_address(pub_key)
-    print(adress)
+    adr = a.pubkey_to_address(pub_key)
+    print(adr)

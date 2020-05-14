@@ -87,5 +87,4 @@ if __name__ == '__main__':
     print('b.sig:' + binascii.b2a_hex(b.sig).decode())
     print('b.get_raw_for_sign:' + binascii.b2a_hex(b.get_raw_for_sign()).decode())
     print('b.get_hash:' + binascii.b2a_hex(b.get_hash()).decode())
-    print('b.get_raw_for_hash:' + binascii.b2a_hex(b.get_raw_for_hash()).decode()[0:2] + binascii.b2a_hex(
-        b.get_hash()).decode() + binascii.b2a_hex(b.get_raw_for_hash()).decode()[2:])
+    print('b.get_raw_for_hash:' + binascii.b2a_hex(b.get_raw_for_hash()).decode()[0:2] + binascii.b2a_hex(b.get_hash()).decode() + binascii.b2a_hex(b.get_raw_for_hash()).decode()[2:])

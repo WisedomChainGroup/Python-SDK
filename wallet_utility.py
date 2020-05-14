@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from key_pair import KeyStore, KeyPair, Crypto, KdfParams
+from key_pair import KeyStore, KeyPair, Crypto, KdfParams, CipherParams
 from argon2_manager import Argon2Manager
 from aes_manager import AesManager
 from keystore_utils import KeystoreUtils
@@ -27,30 +27,30 @@ class WalletUtility:
         aes = AesManager().encrypt_data(binascii.a2b_hex(sk), binascii.a2b_hex(argon2id), binascii.a2b_hex(iv))
         mac = binascii.b2a_hex(Sha3Keccack().calculate_hash(argon2id + aes)).decode()
         key_store = KeyStore(address=address, id=Utils.generate_uuid(), mac=mac)
-        key_store.crypto = Crypto(CIPHER, aes.decode(), v.decode()).__dict__
-        key_store.kdf_params = KdfParams(MEMORYCOST, TIMECOST, PARALLELIS, v.decode()).__dict__
+        key_store.crypto = Crypto(CIPHER, aes.decode(), iv.decode()).__dict__
+        key_store.kdf_params = KdfParams(MEMORYCOST, TIMECOST, PARALLELIS, iv.decode()).__dict__
         return key_store.__dict__
 
 
 if __name__ == '__main__':
-    ps = "00000000"
-    key_store = KeyStore()
-    s, p = KeyPair().get_key()
-    sa = binascii.b2a_hex(secrets.token_bytes(32))
-    v = binascii.b2a_hex(secrets.token_bytes(16))
-    argon2id = Argon2Manager().hash(ps.encode(), sa, TIMECOST, MEMORYCOST, PARALLELIS)
-    address = KeystoreUtils().pubkey_to_address(p)
-    aes = AesManager().encrypt_data(binascii.a2b_hex(s), binascii.a2b_hex(argon2id), binascii.a2b_hex(v))
-    mac = binascii.b2a_hex(Sha3Keccack().calculate_hash(argon2id + aes)).decode()
-    key_store.address = address
-    key_store.crypto = Crypto(CIPHER, aes.decode(), v.decode()).__dict__
-    key_store.id = Utils.generate_uuid()
-    key_store.mac = mac
-    key_store.kdf_params = KdfParams(MEMORYCOST, TIMECOST, PARALLELIS, v.decode()).__dict__
-    print('adress:' + address)
-    print(b'argon2id:' + argon2id)
-    print('aes:' + aes.decode())
-    print('mac:' + mac)
-    print(json.loads(key_store.__dict__))
-    print(WalletUtility().from_password("00000000"))
+    # ps = "00000000"
+    # key_store = KeyStore()
+    # s, p = KeyPair().get_key()
+    # sa = binascii.b2a_hex(secrets.token_bytes(32))
+    # v = binascii.b2a_hex(secrets.token_bytes(16))
+    # argon2id = Argon2Manager().hash(ps.encode(), sa, TIMECOST, MEMORYCOST, PARALLELIS)
+    # address = KeystoreUtils().pubkey_to_address(p)
+    # aes = AesManager().encrypt_data(binascii.a2b_hex(s), binascii.a2b_hex(argon2id), binascii.a2b_hex(v))
+    # mac = binascii.b2a_hex(Sha3Keccack().calculate_hash(argon2id + aes)).decode()
+    # key_store.address = address
+    # key_store.crypto = Crypto(CIPHER, aes.decode(), v.decode()).__dict__
+    # key_store.id = Utils.generate_uuid()
+    # key_store.mac = mac
+    # key_store.kdf_params = KdfParams(MEMORYCOST, TIMECOST, PARALLELIS, v.decode()).__dict__
+    # print('adress:' + address)
+    # print(b'argon2id:' + argon2id)
+    # print('aes:' + aes.decode())
+    # print('mac:' + mac)
+    # print(json.dumps(key_store.__dict__))
+    print(json.dumps(WalletUtility().from_password("00000000")))
 

@@ -1,10 +1,15 @@
 #!/usr/bin/python3
-
-from cryptography.fernet import Fernet
+from typing import Tuple
 import nacl.signing
 import nacl.bindings
 from nacl.utils import StringFixer, random
 import binascii
+
+
+class CipherParams:
+    def __init__(self, iv: str = ''):
+        self.iv = iv
+
 
 class KdfParams:
     def __init__(self, memory_cost: int = 0, time_cost: int = 0, parallelism: int = 0, salt: str = ''):
@@ -15,10 +20,10 @@ class KdfParams:
 
 
 class Crypto:
-    def __init__(self, cipher: str = '', cipher_text: str = '', cipher_params: str = ''):
+    def __init__(self, cipher: str = '', cipher_text: str = '', iv: str = ''):
         self.cipher = cipher
         self.cipher_text = cipher_text
-        self.cipher_params = cipher_params
+        self.cipher_params = CipherParams(iv).__dict__
 
 
 class KeyStore:
@@ -33,20 +38,25 @@ class KeyStore:
 
 
 class KeyPair:
-    def __init__(self):
-        self.seed = random(nacl.bindings.crypto_sign_SEEDBYTES)
-        self.secret_key = binascii.b2a_hex(self.seed)
-        self.public, self.signing_key = nacl.bindings.crypto_sign_seed_keypair(self.seed)
-        self.public_key = binascii.b2a_hex(self.public)
+
+    @staticmethod
+    def get_key() -> Tuple[bytes, bytes]:
+        seed = random(nacl.bindings.crypto_sign_SEEDBYTES)
+        secret_key = binascii.b2a_hex(seed)
+        public, signing_key = nacl.bindings.crypto_sign_seed_keypair(seed)
+        public_key = binascii.b2a_hex(public)
+        return secret_key, public_key
 
 
 if __name__ == '__main__':
-    seed = random(nacl.bindings.crypto_sign_SEEDBYTES)
-    signing_key = nacl.signing.SigningKey.generate()
-    verify_key = signing_key.verify_key
-    print(signing_key)
-    print(verify_key)
-    print(binascii.b2a_hex(seed))
-    public_key, secret_key = nacl.bindings.crypto_sign_seed_keypair(seed)
-    print(binascii.b2a_hex(public_key))
-    print(binascii.b2a_hex(secret_key))
+    # seed = random(nacl.bindings.crypto_sign_SEEDBYTES)
+    # signing_key = nacl.signing.SigningKey.generate()
+    # verify_key = signing_key.verify_key
+    # print(signing_key)
+    # print(verify_key)
+    # print(binascii.b2a_hex(seed))
+    # public_key, secret_key = nacl.bindings.crypto_sign_seed_keypair(seed)
+    # print(binascii.b2a_hex(public_key))
+    # print(binascii.b2a_hex(secret_key))
+    s, p = KeyPair.get_key()
+    print(s, p)
