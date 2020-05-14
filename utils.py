@@ -105,12 +105,22 @@ class Utils:
 
     @staticmethod
     def ripmed160(data: bytes) -> bytes:
+        """
+        ripmed hash
+        :param data: source data
+        :return: digest
+        """
         h = RIPEMD160.new()
         h.update(data)
         return h.digest()
 
     @staticmethod
     def pubkey_to_hash(pubkey: bytes) -> bytes:
+        """
+        convert public key to public key hash
+        :param pubkey: public key
+        :return: public key hash
+        """
         return Utils.ripmed160(Utils.keccak256(pubkey))
 
     @staticmethod
@@ -119,7 +129,26 @@ class Utils:
         return Utils.pubkey_hash_to_address(ret)
 
     @staticmethod
+    def address_to_pubkey_hash(address: str) -> bytes:
+        if address.startswith("WX"):
+            address = address[2:]
+        b5 = Utils.b58decode(address)
+        r2 = b5[:len(b5) - 4]
+        b4 = b5[len(b5) - 4:]
+        r1 = r2[1:]
+        r3 = Utils.keccak256(Utils.keccak256(r1))
+        if r3[0:4] != b4:
+            raise 'invalid address ' + address + ' verify failed'
+        return r1
+
+
+    @staticmethod
     def pubkey_hash_to_address(public_hash: bytes) -> str:
+        """
+        convert public key hash to address
+        :param public_hash:
+        :return:
+        """
         r1 = public_hash
         r2 = bytes(1) + r1
         r3 = Utils.keccak256(Utils.keccak256(r1))
@@ -148,6 +177,11 @@ class Utils:
 
     @staticmethod
     def ed25519_keypair(seed: bytes = b'') -> Tuple[bytes, bytes]:
+        """
+
+        :param seed: ed25519 private key, 32 bytes
+        :return: private key + public key
+        """
         if len(seed) == 0:
             seed = random(nacl.bindings.crypto_sign_SEEDBYTES)
         public, _ = nacl.bindings.crypto_sign_seed_keypair(seed)
@@ -173,3 +207,4 @@ if __name__ == '__main__':
     pub_key = bytes.fromhex("8f194afc6dfe44a95784b14c7ad58e12218987f74bacb3572f8bbb59241572fa")
     adr = Utils.pubkey_to_address(pub_key)
     print(adr)
+    print(Utils.address_to_pubkey_hash(adr).hex())
