@@ -41,7 +41,7 @@ class KeyStore:
 
     def getJson(self) -> str:
         pass
-    
+
     @classmethod
     def createKeyStore(cls, password: str) :
         return cls()
