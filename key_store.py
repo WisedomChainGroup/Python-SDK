@@ -77,7 +77,9 @@ class KeyStore:
         self.kdf_params = KdfParams()
 
     def parse(self, password: str) -> bytes:
-        pass
+        argon_hash = Utils.argon2_hash(associated_data=self.kdf_params.salt + password.encode(), salt=self.kdf_params.salt)
+        sk = Utils.decrypt_data(self.crypto.cipher_text, argon_hash, self.crypto.cipher_params.iv)
+        return sk
 
     def as_dict(self) -> dict:
         return {
@@ -132,7 +134,6 @@ class KeyPair:
 
 
 if __name__ == '__main__':
-    print(KeyStore.create_key_store("00000000").as_dict())
     a = """
 {
     "address": "WX12t3nAs9FshfT1jsWNvGJEZq7UBD1ym2Ei",
@@ -155,4 +156,7 @@ if __name__ == '__main__':
     }
 }    
     """
+    b = KeyStore.create_key_store("00000000")
+    print(KeyStore.parse(b, "00000000"))
     print(json.dumps(KeyStore.from_json(a).as_dict()))
+    keystore = KeyStore.from_json(a)
