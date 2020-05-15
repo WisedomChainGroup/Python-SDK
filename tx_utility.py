@@ -3,7 +3,7 @@
 from utils import Utils
 import nacl.signing
 
-GAS_TABLE = [0, 50000]
+GAS_TABLE = [0, 50000, 100000, 20000]
 FEE = 200000
 TRANSFER = 1
 DEFAULT_VERSION = 1
@@ -55,9 +55,16 @@ class TxUtility:
     def sign_transaction(tx: Transaction, sk: bytes):
         tx.sig = nacl.signing.SigningKey(sk).sign(tx.get_raw_for_sign())[0:-len(tx.get_raw_for_sign())]
 
-    # 构造交易事务
     @staticmethod
     def create_transfer_tx(tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int) -> Transaction:
+        """
+            构造交易事务
+            :param tx_from: bytes
+            :param tx_to: bytes
+            :param tx_amount: bytes
+            :param tx_nonce: bytes
+            :return: Transaction
+        """
         tx = Transaction(
             tx_type=TRANSFER,
             tx_nonce=tx_nonce,
@@ -66,6 +73,115 @@ class TxUtility:
             tx_amount=tx_amount
         )
         tx.gas_price = round(FEE / GAS_TABLE[TRANSFER])
+        return tx
+
+    @staticmethod
+    def create_transfer_vote_tx(tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int) -> Transaction:
+        """
+            构造投票事务
+            :param tx_from: bytes
+            :param tx_to: bytes
+            :param tx_amount: int
+            :param tx_nonce: int
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type=2,
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_to=tx_to,
+            tx_amount=tx_amount
+        )
+        tx.gas_price = round(FEE / GAS_TABLE[3])
+        return tx
+
+    @staticmethod
+    def create_transfer_vote_with_tx(tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int, tx_id: bytes) -> Transaction:
+        """
+            构造投票事务
+            :param tx_from: bytes
+            :param tx_to: bytes
+            :param tx_amount: int
+            :param tx_nonce: int
+            :param tx_id: bytes
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type=13,
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_to=tx_to,
+            tx_amount=tx_amount,
+            payload=tx_id,
+        )
+        tx.gas_price = round(FEE / GAS_TABLE[3])
+        return tx
+
+    @staticmethod
+    def create_transfer_mortgage_tx(tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int) -> Transaction:
+        """
+            构造抵押事务
+            :param tx_from: bytes
+            :param tx_to: bytes
+            :param tx_amount: int
+            :param tx_nonce: int
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type=14,
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_to=tx_to,
+            tx_amount=tx_amount,
+        )
+        tx.gas_price = round(FEE / GAS_TABLE[3])
+        return tx
+
+    @staticmethod
+    def create_transfer_mortgage_with_tx(tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int, tx_id: bytes) -> Transaction:
+        """
+            构造抵押事务
+            :param tx_from: bytes
+            :param tx_to: bytes
+            :param tx_amount: int
+            :param tx_nonce: int
+            :param tx_id: bytes
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type=14,
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_to=tx_to,
+            tx_amount=tx_amount,
+            payload=tx_id,
+        )
+        tx.gas_price = round(FEE / GAS_TABLE[3])
+        return tx
+
+    @staticmethod
+    def create_transfer_prove_with_tx(tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int) -> Transaction:
+        """
+            构造存证事务
+            :param tx_from: bytes
+            :param tx_to: bytes
+            :param tx_amount: int
+            :param tx_nonce: int
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type=3,
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_to=tx_to,
+            tx_amount=tx_amount
+        )
+        tx.gas_price = round(FEE / GAS_TABLE[2])
         return tx
 
 
@@ -78,12 +194,8 @@ if __name__ == '__main__':
     a = TxUtility()
     b = a.create_transfer_tx(fromPubkey, toPubkeyHash, amount, nonce)
     print('b.sig: ' + b.sig.hex())
+    print('b.get_raw_for_sign: ' + b.get_raw_for_sign().hex())
     a.sign_transaction(b, prikey)
     print('b.sig: ' + b.sig.hex())
-    print('b.get_raw_for_sign: ' + b.get_raw_for_sign().hex())
     print('b.get_hash: ' + b.get_hash().hex())
-    print('b.get_raw_for_hash: '
-          + b.get_raw_for_hash().hex()[0:2]
-          + b.get_hash().hex()
-          + b.get_raw_for_hash().hex()[2:]
-    )
+    print('b.get_raw_for_hash: ' + b.get_raw_for_hash().hex())
