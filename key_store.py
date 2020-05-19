@@ -137,30 +137,25 @@ class KeyPair:
 
 
 if __name__ == '__main__':
-    a = """
-{
-    "address": "WX12t3nAs9FshfT1jsWNvGJEZq7UBD1ym2Ei",
-    "kdfparams": {
-        "salt": "ec3932e9c96483ad99d752de8aa15f5bc57a3ee15e7165ce66aa14df699098d7",
-        "memoryCost": 20480,
-        "parallelism": 2,
-        "timeCost": 4
-    },
-    "id": "377b4eae-32d8-4b7f-a475-2ecaae162ec4",
-    "kdf": "argon2id",
-    "version": "2",
-    "mac": "be8e52b318ee69ed3ab4e88719da3cde9c46f883dca5a134b6580ededd036b99",
-    "crypto": {
-        "cipher": "aes-256-ctr",
-        "ciphertext": "12dfd5e07430afbb50c60317a531376b869b5cfa2f5eb33f480d14fded8b9606",
-        "cipherparams": {
-            "iv": "bfc8af56f4e701ecfaddb0c06f7bc915"
-        }
-    }
-}    
+    a = """ {"address": "WX1GPpYX1gPSkcuemo9CkHMQabjWnVnoHJPT", 
+    "id": "9cf0f3fd-9976-11ea-aa30-04d4c44dc4c5", 
+    "version": "2", 
+    "mac": "2e513fb52e59e9aca0dee97eb4a0db7844444fa3dc764dc03d3401d026af5770", 
+    "kdfparams": {"salt": "6a389d4f1e966835c52710d95eb13491ffc3c1ae329a26a823cc2aef083cce27", 
+        "memoryCost": 20480, 
+        "parallelism": 2, 
+        "timeCost": 4}, 
+    "crypto": {"cipher": "aes-256-ctr", 
+        "ciphertext": "9dee7d0462e8204140b3bb4585d7f87d54ae0ce34a39d49a441c084eeed4e784", 
+        "cipherparams": {"iv": "0c466273542f3982736e516d49e0d07c"}}, 
+    "kdf": "argon2id"}
     """
-    b = KeyStore.create_key_store("00000000")
-    print(b.parse("00000000").hex())
-    print(json.dumps(KeyStore.from_json(a).as_dict()))
+    key_store = KeyStore.create_key_store("00000000")
+    print(key_store.as_dict())
     keystore = KeyStore.from_json(a)
-    print(keystore.parse("00000000").hex())
+    sk = keystore.parse("00000000")
+    print(sk.hex())
+    pubkey_hash = Utils.address_to_pubkey_hash('WX1GPpYX1gPSkcuemo9CkHMQabjWnVnoHJPT')
+    print(pubkey_hash.hex())
+    sk, pk = Utils.ed25519_keypair(sk)
+    print(pk.hex())

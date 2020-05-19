@@ -184,13 +184,42 @@ class TxUtility:
         tx.gas_price = round(FEE / GAS_TABLE[2])
         return tx
 
+    @staticmethod
+    def create_transfer_deploy_for_rule_asset_tx(tx_from: bytes, tx_nonce: int, tx_code: str, tx_offering: int, tx_total_amount: int, tx_create_user: bytes, tx_owner: bytes, tx_allow_increase: int, tx_info: bytes) -> Transaction:
+        """
+            部署资产定义事务
+            :param tx_from: bytes
+            :param tx_nonce: int
+            :param tx_code: str
+            :param tx_offering: int
+            :param tx_total_amount: int
+            :param tx_create_user: bytes
+            :param tx_owner: bytes
+            :param tx_allow_increase: int
+            :param tx_info: bytes
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type=7,
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_to=b"0000000000000000000000000000000000000000",
+            tx_amount=0
+        )
+        tx.gas_price = round(FEE / GAS_TABLE[2])
+        return tx
 
 if __name__ == '__main__':
-    fromPubkey = bytes.fromhex('7a94e5c3c8bf9bbf23df6d195ff3a76322088a94886f5bfee70ac574d11bd52a')
-    toPubkeyHash = bytes.fromhex('0d5babadfba67318fce816e3ebf27d727808c98f')
+    # fromPubkey = bytes.fromhex('7a94e5c3c8bf9bbf23df6d195ff3a76322088a94886f5bfee70ac574d11bd52a')
+    # toPubkeyHash = bytes.fromhex('fbdacd374729b74c594cf955dc207fbb1d203a10')
+    # amount = 10 * 100000000
+    # prikey = bytes.fromhex('f0d55ae8a79186e8595514fe23dec8716a191d2bb525998298371693dc69a926')
+    fromPubkey = bytes.fromhex('fce8ec82c17bbd763e2edfbbd9ae9cb24bfa2181e166c4c8590435c6383a4465')
+    toPubkeyHash = bytes.fromhex('a8dab9a3828d750174c25f09ab619f55d7533346')
     amount = 10 * 100000000
-    prikey = bytes.fromhex('f0d55ae8a79186e8595514fe23dec8716a191d2bb525998298371693dc69a926')
-    nonce = 2
+    prikey = bytes.fromhex('a4643462e43c642418f638d5cb0ba7bf79d3887e7df0e146a0a7a1738eef0107')
+    nonce = 1
     a = TxUtility()
     b = a.create_transfer_tx(fromPubkey, toPubkeyHash, amount, nonce)
     print('b.sig: ' + b.sig.hex())

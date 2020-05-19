@@ -88,3 +88,16 @@ address = store["address"]
 # 返回类型：str
 # 返回值：地址
 ```
+
+* 2.6 通过地址获得公钥哈希
+```python
+from utils import Utils
+
+address = 'WX1GPpYX1gPSkcuemo9CkHMQabjWnVnoHJPT'
+# 获得公钥哈希
+pubkey_hash = Utils.address_to_pubkey_hash(address)
+# 参数：
+#  1）、address str
+# 返回类型：bytes
+# 返回值：公钥哈希
+```
