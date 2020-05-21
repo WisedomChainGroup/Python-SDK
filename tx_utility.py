@@ -3,7 +3,7 @@
 from utils import Utils
 import nacl.signing
 import rlp
-import binascii
+
 
 GAS_TABLE = [0, 50000, 100000, 20000]
 FEE = 200000
@@ -21,22 +21,45 @@ TYPE_DICT = {
                 "MULTIPLE_FOR_RULE_FIRST": 7,
                 "MULTIPLE_FOR_RULE_SPLICE": 7,
                 "MULTI_SIGNATURE_FOR_FIRST": 8,
+                "HASH_TIME_BLOCK_FOR_DEPLOY": 7,
+                "HASH_TIME_BLOCK_GET_FOR_DEPLOY": 8,
+                "HASH_TIME_BLOCK_TRANSFER_FOR_DEPLOY": 8,
+                "HASH_HEIGHT_BLOCK_FOR_DEPLOY": 7,
+                "HASH_HEIGHT_BLOCK_GET_FOR_DEPLOY": 8,
+                "HASH_HEIGHT_BLOCK_TRANSFER_FOR_DEPLOY": 8,
             }
 TYPE_LIST_ZERO = ["TRANSFER", "TRANSFER_VOTE", "TRANSFER_VOTE_WITH", "TRANSFER_MORTGAGE", "TRANSFER_MORTGAGE_WITH", "TRANSFER_PROVE"]
 TYPE_LIST_ONE = ["DEPLOY_FOR_RULE_ASSET", "TRANSFER_CALL_FOR_RULE_ASSET_CHANGE_OWNER"]
 TYPE_LIST_TWO = ["TRANSFER_CALL_FOR_RULE_ASSET_INCREASED", "TRANSFER_DEPLOY_FOR_RULE_ASSET", "MULTIPLE_FOR_RULE_FIRST", "MULTIPLE_FOR_RULE_SPLICE"]
-TYPE_LIST_FOUR = ["MULTI_SIGNATURE_FOR_FIRST"]
+TYPE_LIST_THREE = ["HASH_TIME_BLOCK_FOR_DEPLOY"]
+TYPE_LIST_FOUR = ["MULTI_SIGNATURE_FOR_FIRST", "HASH_HEIGHT_BLOCK_FOR_DEPLOY"]
+TYPE_LIST_FIVE = ["HASH_TIME_BLOCK_TRANSFER_FOR_DEPLOY"]
+TYPE_LIST_SIX = ["HASH_TIME_BLOCK_GET_FOR_DEPLOY"]
+TYPE_LIST_SEVEN = ["HASH_HEIGHT_BLOCK_TRANSFER_FOR_DEPLOY"]
+TYPE_LIST_EIGHT = ["HASH_HEIGHT_BLOCK_GET_FOR_DEPLOY"]
 DEFAULT_VERSION = 1
 
 
 class Multiple:
-    def __init__(self, mt_asset_hash: bytes = b'', mt_max: int = 0, mt_min: int = 0, mt_pub_list: bytearray = [],
-                 mt_signatures: bytearray = [], mt_pubkey_hash_list: bytearray = []):
-        self.mt_asset_hash = mt_asset_hash
-        self.mt_max = mt_max
-        self.mt_min = mt_min
-        self.mt_pub_list = mt_pub_list
+    def __init__(self, m_asset_hash: bytes = b'', m_max: int = 0, m_min: int = 0, m_pub_list: bytearray = [],
+                 m_signatures: bytearray = [], m_pubkey_hash_list: bytearray = []):
+        self.m_asset_hash = m_asset_hash
+        self.m_max = m_max
+        self.m_min = m_min
+        self.m_pub_list = m_pub_list
+        self.m_signatures = m_signatures
+        self.m_pubkey_hash_list = m_pubkey_hash_list
+
+
+class MultipleTransfer:
+    def __init__(self, mt_origin: int = 0, mt_dest: int = 0, mt_from: bytearray = [], mt_signatures: bytearray = [],
+                 mt_to: bytes = b'', mt_value: int = 0, mt_pubkey_hash_list: bytearray = []):
+        self.mt_origin = mt_origin
+        self.mt_dest = mt_dest
+        self.mt_from = mt_from
         self.mt_signatures = mt_signatures
+        self.mt_to = mt_to
+        self.mt_value = mt_value
         self.mt_pubkey_hash_list = mt_pubkey_hash_list
 
 
@@ -114,8 +137,18 @@ class Transaction:
             ret += bytes(1)
         elif self.tx_type in TYPE_LIST_TWO:
             ret += Utils.encode_u8(1)
+        elif self.tx_type in TYPE_LIST_THREE:
+            ret += Utils.encode_u8(2)
         elif self.tx_type in TYPE_LIST_FOUR:
             ret += Utils.encode_u8(3)
+        elif self.tx_type in TYPE_LIST_FIVE:
+            ret += Utils.encode_u8(4)
+        elif self.tx_type in TYPE_LIST_SIX:
+            ret += Utils.encode_u8(5)
+        elif self.tx_type in TYPE_LIST_SEVEN:
+            ret += Utils.encode_u8(6)
+        elif self.tx_type in TYPE_LIST_EIGHT:
+            ret += Utils.encode_u8(7)
         ret += self.payload
         return ret
 
@@ -431,7 +464,7 @@ class TxUtility:
     @staticmethod
     def create_transfer_multi_signature_for_first_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_origin: int, tx_dest: int, tx_from_list: bytearray, tx_signatures: bytearray, tx_to_list: bytearray, tx_amount: int, tx_public_key_hash_list: bytearray) -> Transaction:
         """
-            构造多重签名部署（拼接事务）
+            构造多重签名转账（发布者签名）
             :param tx_from: bytes
             :param tx_hash: bytes
             :param tx_nonce: int
@@ -458,6 +491,154 @@ class TxUtility:
         tx_rlp = [tx_origin_encode, tx_dest_encode, tx_from_list, tx_signatures, tx_to_list, tx_amount_encode, tx_public_key_hash_list]
         tx.payload = rlp.encode(tx_rlp)
         tx.gas_price = round(FEE / GAS_TABLE[2])
+        return tx
+
+    @staticmethod
+    def create_hash_time_block_for_deploy_tx(tx_from: bytes, tx_nonce: int,  tx_asset_hash: bytes, tx_public_hash: bytes) -> Transaction:
+        """
+            构造时间锁定的事务
+            :param tx_from: bytes
+            :param tx_nonce: int
+            :param tx_asset_hash: bytes
+            :param tx_public_hash: bytes
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type="HASH_TIME_BLOCK_FOR_DEPLOY",
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_amount=0
+        )
+        tx.gas_price = round(FEE / GAS_TABLE[2])
+        tx.tx_to = bytes(20)
+        tx_rlp = [tx_asset_hash, tx_public_hash]
+        tx.payload = rlp.encode(tx_rlp)
+        return tx
+
+    @staticmethod
+    def create_hash_time_block_get_for_deploy_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_transfer_hash: bytes, tx_origin_text: bytes) -> Transaction:
+        """
+            构造获得锁定资产事务
+            :param tx_from: bytes
+            :param tx_hash: bytes
+            :param tx_nonce: int
+            :param tx_transfer_hash: bytes
+            :param tx_origin_text: bytes
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type="HASH_TIME_BLOCK_GET_FOR_DEPLOY",
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_amount=0
+        )
+        tx.gas_price = round(FEE / GAS_TABLE[2])
+        tx.tx_to = Utils.ripmed160(tx_hash)
+        tx_rlp = [tx_transfer_hash, tx_origin_text]
+        tx.payload = rlp.encode(tx_rlp)
+        return tx
+
+    @staticmethod
+    def create_hash_time_block_transfer_for_deploy_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_amount: int, tx_hash_result: bytes, tx_time_stamp: int) -> Transaction:
+        """
+            构造时间锁定的转发资产事务
+            :param tx_from: bytes
+            :param tx_hash: bytes
+            :param tx_nonce: int
+            :param tx_amount: int
+            :param tx_hash_result: bytes
+            :param tx_time_stamp: int
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type="HASH_TIME_BLOCK_TRANSFER_FOR_DEPLOY",
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_amount=0
+        )
+        tx.gas_price = round(FEE / GAS_TABLE[2])
+        tx.tx_to = Utils.ripmed160(tx_hash)
+        tx_amount_encode = Utils.encode_u8(tx_amount)
+        tx_time_stamp_encode = Utils.encode_u8(tx_time_stamp)
+        tx_rlp = [tx_amount_encode, tx_hash_result, tx_time_stamp_encode]
+        tx.payload = rlp.encode(tx_rlp)
+        return tx
+
+    @staticmethod
+    def create_hash_height_block_for_deploy_tx(tx_from: bytes, tx_nonce: int, tx_asset_hash: bytes, tx_pubkey_hash: bytes) -> Transaction:
+        """
+            构造区块高度锁定支付的事务
+            :param tx_from: bytes
+            :param tx_nonce: int
+            :param tx_asset_hash: bytes
+            :param tx_pubkey_hash: bytes
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type="HASH_HEIGHT_BLOCK_FOR_DEPLOY",
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_amount=0
+        )
+        tx.gas_price = round(FEE / GAS_TABLE[2])
+        tx.tx_to = bytes(40)
+        tx_rlp = [tx_asset_hash, tx_pubkey_hash]
+        tx.payload = rlp.encode(tx_rlp)
+        return tx
+
+    @staticmethod
+    def create_hash_height_block_get_for_deploy_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_transfer_hash: bytes, tx_origin_text: bytes) -> Transaction:
+        """
+            构造区块高度锁定的获得锁定资产事务
+            :param tx_from: bytes
+            :param tx_hash: bytes
+            :param tx_nonce: int
+            :param tx_transfer_hash: bytes
+            :param tx_origin_text: bytes
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type="HASH_HEIGHT_BLOCK_GET_FOR_DEPLOY",
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_amount=0
+        )
+        tx.gas_price = round(FEE / GAS_TABLE[2])
+        tx.tx_to = Utils.ripmed160(tx_hash)
+        tx_rlp = [tx_transfer_hash, tx_origin_text]
+        tx.payload = rlp.encode(tx_rlp)
+        return tx
+
+    @staticmethod
+    def create_hash_height_block_transfer_for_deploy_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_amount: int, tx_hash_result: bytes, tx_block_height: int) -> Transaction:
+        """
+            构造区块高度锁定的转发资产事务
+            :param tx_from: bytes
+            :param tx_hash: bytes
+            :param tx_nonce: int
+            :param tx_amount: int
+            :param tx_hash_result: bytes
+            :param tx_block_height: int
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type="HASH_HEIGHT_BLOCK_TRANSFER_FOR_DEPLOY",
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_amount=0
+        )
+        tx.gas_price = round(FEE / GAS_TABLE[2])
+        tx.tx_to = Utils.ripmed160(tx_hash)
+        tx_amount_encode = Utils.encode_u8(tx_amount)
+        tx_block_height_encode = Utils.encode_u8(tx_block_height)
+        tx_rlp = [tx_amount_encode, tx_hash_result, tx_block_height_encode]
+        tx.payload = rlp.encode(tx_rlp)
         return tx
 
 
