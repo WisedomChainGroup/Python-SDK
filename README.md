@@ -206,8 +206,8 @@ transaction = tx_utility.create_transfer_tx(from_pubkey, to_pubkey_hash, amount,
 #  2）、接收者公钥哈希（bytes)
 #  3）、转账金额(int)
 #  4）、nonce(int)
-# 返回类型：十六进制字符串
-# 返回值：未签名的事务哈希
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
 ```
 
 * 2.14 签名事务
@@ -232,4 +232,117 @@ sign = tx_utility.sign_transaction(transaction, private_key)
 #  2）、私钥(bytes)
 # 返回类型：十六进制字符(bytes)
 # 返回值：签名哈希
+```
+
+* 2.15 构造存证事务
+```python
+from tx_utility import TxUtility
+
+from_pubkey = b'from_pubkey'
+tx_payload = b'tx_payload'
+amount = 10 * 100000000
+nonce = 0 + 1
+
+# 创建原生存证事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_transfer_prove_tx(from_pubkey, tx_payload, nonce)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、存证内容（bytes)
+#  3）、Nonce(int)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.16 构造投票事务
+```python
+from tx_utility import TxUtility
+
+from_pubkey = b'from_pubkey'
+to_pubkey_hash = b'to_pubkey_hash'
+amount = 10 * 100000000
+nonce = 0 + 1
+
+# 创建原生投票事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_transfer_vote_tx(from_pubkey, to_pubkey_hash, amount, nonce)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、接收者公钥哈希（bytes)
+#  3）、票数(int)
+#  4）、nonce(int)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.17 构造投票撤回事务
+```python
+from tx_utility import TxUtility
+
+from_pubkey = b'from_pubkey'
+to_pubkey_hash = b'to_pubkey_hash'
+amount = 10 * 100000000
+nonce = 0 + 1
+tx_id = b'tx_id'
+
+# 创建原生投票撤回事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_transfer_vote_with_tx(from_pubkey, to_pubkey_hash, amount, nonce, tx_id)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、接收者公钥哈希（bytes)
+#  3）、票数(int)
+#  4）、nonce(int)
+#  5）、投票事务哈希(bytes)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.18 构造抵押事务
+```python
+from tx_utility import TxUtility
+
+from_pubkey = b'from_pubkey'
+to_pubkey_hash = b'to_pubkey_hash'
+amount = 10 * 100000000
+nonce = 0 + 1
+
+# 创建原生抵押事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_transfer_mortgage_tx(from_pubkey, to_pubkey_hash, amount, nonce)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、接收者公钥哈希（bytes)
+#  3）、金额(int)
+#  4）、nonce(int)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.19 构造抵押撤回事务
+```python
+from tx_utility import TxUtility
+
+from_pubkey = b'from_pubkey'
+to_pubkey_hash = b'to_pubkey_hash'
+amount = 10 * 100000000
+nonce = 0 + 1
+tx_id = b'tx_id'
+
+# 创建原生抵押撤回事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_transfer_mortgage_with_tx(from_pubkey, to_pubkey_hash, amount, nonce, tx_id)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、接收者公钥哈希（bytes)
+#  3）、金额(int)
+#  4）、nonce(int)
+#  5）、抵押事务哈希(bytes)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
 ```

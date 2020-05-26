@@ -212,7 +212,7 @@ class TxUtility:
     @staticmethod
     def create_transfer_vote_with_tx(tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int, tx_id: bytes) -> Transaction:
         """
-            构造投票事务
+            构造投票撤回事务
             :param tx_from: bytes
             :param tx_to: bytes
             :param tx_amount: int
@@ -256,7 +256,7 @@ class TxUtility:
     @staticmethod
     def create_transfer_mortgage_with_tx(tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int, tx_id: bytes) -> Transaction:
         """
-            构造抵押事务
+            构造抵押撤回事务
             :param tx_from: bytes
             :param tx_to: bytes
             :param tx_amount: int
@@ -277,12 +277,11 @@ class TxUtility:
         return tx
 
     @staticmethod
-    def create_transfer_prove_tx(tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int) -> Transaction:
+    def create_transfer_prove_tx(tx_from: bytes, tx_payload: bytes, tx_nonce: int) -> Transaction:
         """
             构造存证事务
             :param tx_from: bytes
-            :param tx_to: bytes
-            :param tx_amount: int
+            :param tx_payload: bytes
             :param tx_nonce: int
             :return: Transaction
         """
@@ -291,9 +290,9 @@ class TxUtility:
             tx_type="TRANSFER_PROVE",
             tx_nonce=tx_nonce,
             tx_from=tx_from,
-            tx_to=tx_to,
-            tx_amount=tx_amount
         )
+        tx.tx_to = bytes(20)
+        tx.payload = tx_payload
         tx.gas_price = round(FEE / GAS_TABLE[2])
         return tx
 
