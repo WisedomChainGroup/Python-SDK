@@ -17,7 +17,7 @@ APPSDK是提供给APP调用的方法，主要是提供给实现普通转账事�
 {"message":"描述","data":["数据"],"statusCode": 5000}
 ```
 
-## 2.0 JAVA-SDK文档
+## 2.0 PYTHON-SDK文档
 * 2.1 生成keystore文件
 ```python
 from key_store import KeyStore
@@ -343,6 +343,135 @@ transaction = tx_utility.create_transfer_mortgage_with_tx(from_pubkey, to_pubkey
 #  3）、金额(int)
 #  4）、nonce(int)
 #  5）、抵押事务哈希(bytes)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.20 部署资产定义事务
+```python
+from tx_utility import TxUtility
+
+tx_from = b'tx_from'
+tx_nonce = 0 + 1
+tx_code = str("tx_code")
+tx_offering = 10 * 100000000
+tx_total_amount = 10 * 100000000
+tx_create_user = b'tx_create_user'
+tx_owner = b'tx_owner'
+tx_allow_increase = 1
+tx_info = b'tx_info'
+
+# 部署资产定义事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_deploy_for_rule_asset_tx(tx_from, tx_nonce, tx_code, tx_offering, tx_total_amount, tx_create_user, tx_owner, tx_allow_increase, tx_info)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、nonce(int)
+#  3）、code(str，资产代码)
+#  4）、offering（int，期初发行额度)
+#  5）、create_user(bytes，规则创建者的公钥)
+#  6）、owner（bytes，规则所有者的地址)
+#  7）、allow_increase(int 是否允许增发 1表示允许，0表示不允许)
+#  8）、info(string 说明)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.21 构造资产定义的更换所有者事务
+```python
+from tx_utility import TxUtility
+
+tx_from = b'tx_from'
+tx_hash = b'tx_hash'
+tx_nonce = 0 + 1
+tx_new_owner = b'tx_new_owner'
+
+# 构造资产定义的更换所有者事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_transfer_call_for_rule_asset_change_owner_tx(tx_from, tx_hash, tx_nonce, tx_new_owner)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、事务哈希(bytes)
+#  3）、nonce(int)
+#  4）、new_owner(bytes，新的目标用户地址)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.22 构造资产定义的增发事务
+```python
+from tx_utility import TxUtility
+
+tx_from = b'tx_from'
+tx_hash = b'tx_hash'
+tx_nonce = 0 + 1
+tx_amount = 10 * 100000000
+
+# 构造资产定义的增发事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_transfer_call_for_rule_asset_increased_tx(tx_from, tx_hash, tx_nonce, tx_amount)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、事务哈希(bytes)
+#  3）、nonce(int)
+#  4）、amount(bytes，增发的金额)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.23 构造资产定义的转账事务
+```python
+from tx_utility import TxUtility
+
+tx_from = b'tx_from'
+tx_hash = b'tx_from'
+tx_nonce = 0 + 1
+tx_from_asset = b'tx_from_asset'
+tx_to_asset = b'tx_to_asset'
+tx_amount = 10 * 100000000
+
+# 构造资产定义的转账事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_transfer_call_for_rule_asset_increased_tx(tx_from, tx_hash, tx_nonce, tx_from_asset, tx_to_asset, tx_amount)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、事务哈希(bytes)
+#  3）、nonce(int)
+#  4）、from(bytes，公钥)
+#  5）、to(bytes，目标地址的公钥哈希)
+#  6）、value(int，转发金额，必须大于0，整数)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.24 构造签名的多重规则部署（发布者签名）
+```python
+from tx_utility import TxUtility
+
+tx_from = b'tx_from'
+tx_nonce = 0 + 1
+tx_asset_hash = b'tx_from'
+tx_max = 10
+tx_min = 1
+tx_pub_list = [b'tx', b'pub', b'list']
+tx_signatures = [b'tx', b'signatures']
+tx_public_key_hash_list = [b'tx', b'public', b'key', b'hash', b'list']
+
+# 构造签名的多重规则部署（发布者签名）
+tx_utility = TxUtility()
+transaction = tx_utility.create_multiple_for_rule_first_tx(tx_from, tx_nonce, tx_asset_hash, tx_max, tx_min, tx_pub_list, tx_signatures, tx_public_key_hash_list)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、nonce(int，发布人的当前nonce)
+#  3）、asset_hash(bytes  资产的哈希值)
+#  4）、max(int   总计可以具备的签名数)
+#  5）、min(int   最少需要达到的签名数)
+#  6）、public_key_hash_list(bytes的集合  公钥数组)
 # 返回类型：Transaction(bytes)
 # 返回值：未签名的事务
 ```

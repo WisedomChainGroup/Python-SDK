@@ -141,7 +141,6 @@ class Utils:
             raise BaseException('invalid address ' + address + ' verify failed')
         return r1
 
-
     @staticmethod
     def pubkey_hash_to_address(public_hash: bytes) -> str:
         """

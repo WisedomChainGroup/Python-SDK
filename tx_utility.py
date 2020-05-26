@@ -41,8 +41,8 @@ DEFAULT_VERSION = 1
 
 
 class Multiple:
-    def __init__(self, m_asset_hash: bytes = b'', m_max: int = 0, m_min: int = 0, m_pub_list: bytearray = [],
-                 m_signatures: bytearray = [], m_pubkey_hash_list: bytearray = []):
+    def __init__(self, m_asset_hash: bytes = b'', m_max: int = 0, m_min: int = 0, m_pub_list=[],
+                 m_signatures=[], m_pubkey_hash_list=[]):
         self.m_asset_hash = m_asset_hash
         self.m_max = m_max
         self.m_min = m_min
@@ -52,8 +52,8 @@ class Multiple:
 
 
 class MultipleTransfer:
-    def __init__(self, mt_origin: int = 0, mt_dest: int = 0, mt_from: bytearray = [], mt_signatures: bytearray = [],
-                 mt_to: bytes = b'', mt_value: int = 0, mt_pubkey_hash_list: bytearray = []):
+    def __init__(self, mt_origin: int = 0, mt_dest: int = 0, mt_from=[], mt_signatures=[],
+                 mt_to: bytes = b'', mt_value: int = 0, mt_pubkey_hash_list=[]):
         self.mt_origin = mt_origin
         self.mt_dest = mt_dest
         self.mt_from = mt_from
@@ -316,9 +316,9 @@ class TxUtility:
             tx_type="DEPLOY_FOR_RULE_ASSET",
             tx_nonce=tx_nonce,
             tx_from=tx_from,
-            tx_to=b"0000000000000000000000000000000000000000",
             tx_amount=0
         )
+        tx.tx_to = bytes(20)
         at = Asset(
             at_code=tx_code,
             at_offering=tx_offering,
@@ -355,13 +355,13 @@ class TxUtility:
         return tx
 
     @staticmethod
-    def create_transfer_call_for_rule_asset_increased_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_new_owner: bytes) -> Transaction:
+    def create_transfer_call_for_rule_asset_increased_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_amount: int) -> Transaction:
         """
             构造资产定义的增发事务
             :param tx_from: bytes
             :param tx_hash: bytes
             :param tx_nonce: int
-            :param tx_new_owner: bytes
+            :param tx_amount: int
             :return: Transaction
         """
         tx = Transaction(
@@ -372,7 +372,8 @@ class TxUtility:
             tx_amount=0
         )
         tx.tx_to = Utils.ripmed160(tx_hash)
-        tx.payload = rlp.encode(tx_new_owner)
+        tx_amount_encode = Utils.encode_u8(tx_amount)
+        tx.payload = rlp.encode(tx_amount_encode)
         tx.gas_price = round(FEE / GAS_TABLE[2])
         return tx
 
@@ -403,7 +404,7 @@ class TxUtility:
         return tx
 
     @staticmethod
-    def create_multiple_for_rule_first_tx(tx_from: bytes, tx_nonce: int, tx_asset_hash: bytes, tx_max: int, tx_min: int, tx_pub_list: bytearray, tx_signatures: bytearray, tx_public_key_hash_list: bytearray) -> Transaction:
+    def create_multiple_for_rule_first_tx(tx_from: bytes, tx_nonce: int, tx_asset_hash: bytes, tx_max: int, tx_min: int, tx_pub_list: [], tx_signatures: [], tx_public_key_hash_list: []) -> Transaction:
         """
             构造签名的多重规则部署（发布者签名）
             :param tx_from: bytes
@@ -411,9 +412,9 @@ class TxUtility:
             :param tx_asset_hash: bytes
             :param tx_max: int
             :param tx_min: int
-            :param tx_pub_list: bytearray
-            :param tx_signatures: bytearray
-            :param tx_public_key_hash_list: bytearray
+            :param tx_pub_list: []
+            :param tx_signatures: []
+            :param tx_public_key_hash_list: []
             :return: Transaction
         """
         tx = Transaction(
@@ -432,7 +433,7 @@ class TxUtility:
         return tx
 
     @staticmethod
-    def create_multiple_for_rule_splice_tx(tx_from: bytes, tx_nonce: int, tx_asset_hash: bytes, tx_max: int, tx_min: int, tx_pub_list: bytearray, tx_signatures: bytearray, tx_public_key_hash_list: bytearray) -> Transaction:
+    def create_multiple_for_rule_splice_tx(tx_from: bytes, tx_nonce: int, tx_asset_hash: bytes, tx_max: int, tx_min: int, tx_pub_list: [], tx_signatures: [], tx_public_key_hash_list: []) -> Transaction:
         """
             构造多重签名部署（拼接事务）
             :param tx_from: bytes
@@ -440,9 +441,9 @@ class TxUtility:
             :param tx_asset_hash: bytes
             :param tx_max: int
             :param tx_min: int
-            :param tx_pub_list: bytearray
-            :param tx_signatures: bytearray
-            :param tx_public_key_hash_list: bytearray
+            :param tx_pub_list: []
+            :param tx_signatures: []
+            :param tx_public_key_hash_list: []
             :return: Transaction
         """
         tx = Transaction(
@@ -461,7 +462,7 @@ class TxUtility:
         return tx
 
     @staticmethod
-    def create_transfer_multi_signature_for_first_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_origin: int, tx_dest: int, tx_from_list: bytearray, tx_signatures: bytearray, tx_to_list: bytearray, tx_amount: int, tx_public_key_hash_list: bytearray) -> Transaction:
+    def create_transfer_multi_signature_for_first_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_origin: int, tx_dest: int, tx_from_list: [], tx_signatures: [], tx_to_list: [], tx_amount: int, tx_public_key_hash_list: []) -> Transaction:
         """
             构造多重签名转账（发布者签名）
             :param tx_from: bytes
@@ -469,11 +470,11 @@ class TxUtility:
             :param tx_nonce: int
             :param tx_origin: int
             :param tx_dest: int
-            :param tx_from_list: bytearray
-            :param tx_signatures: bytearray
-            :param tx_to_list: bytearray
+            :param tx_from_list: []
+            :param tx_signatures: []
+            :param tx_to_list: []
             :param tx_amount: int
-            :param tx_public_key_hash_list: bytearray
+            :param tx_public_key_hash_list: []
             :return: Transaction
         """
         tx = Transaction(
