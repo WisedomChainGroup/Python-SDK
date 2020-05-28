@@ -1,24 +1,6 @@
 # Python-SDK文档
-```
-APPSDK是提供给APP调用的方法，主要是提供给实现普通转账事务的构造，签名，发送以及孵化器相关的操作，
-对于RPC来说，提供若干的接口，对于客户端来说，需要提供若干的实现方法，如下所示：
-```
-
-## 1.0 基本说明
-
-* 1.1 区块确认完成
-```
-通过事务的哈希值查询确认区块数，并且确认是否已经完成， 我们认为往后确定2区块即可表示已经完成。 
-无论什么事务，都要等待至少2个区块确认才算完成。
-```
-
-* 1.2 返回格式
-```json
-{"message":"描述","data":["数据"],"statusCode": 5000}
-```
-
-## 2.0 PYTHON-SDK文档
-* 2.1 生成keystore文件
+## 1.0 PYTHON-SDK文档
+* 1.1 生成keystore文件
 ```python
 from key_store import KeyStore
 
@@ -33,7 +15,7 @@ print(KeyStore.from_json(key_store).as_dict())
 
 ```
 
-* 2.2 地址校验
+* 1.2 地址校验
 ```python
 from utils import Utils
 
@@ -48,7 +30,7 @@ pubkey_hash = Utils().address_to_pubkey_hash(address)
 #  抛异常 -> 地址错误
 ```
 
-* 2.3 通过地址获得公钥哈希
+* 1.3 通过地址获得公钥哈希
 ```python
 from utils import Utils
 
@@ -61,7 +43,7 @@ pubkey_hash = Utils().address_to_pubkey_hash(address)
 # 返回值：pubkey_hash(公钥哈希)
 ```
 
-* 2.4 通过公钥哈希获得地址
+* 1.4 通过公钥哈希获得地址
 ```python
 from utils import Utils
 
@@ -74,7 +56,7 @@ address = Utils().pubkey_hash_to_address(pubkey_hash)
 # 返回值：address(地址)
 ```
 
-* 2.5 通过keystore获得地址
+* 1.5 通过keystore获得地址
 ```python
 from key_store import KeyStore
 
@@ -89,7 +71,7 @@ address = store["address"]
 # 返回值：地址
 ```
 
-* 2.6 通过地址获得公钥哈希
+* 1.6 通过地址获得公钥哈希
 ```python
 from utils import Utils
 
@@ -102,7 +84,7 @@ pubkey_hash = Utils.address_to_pubkey_hash(address)
 # 返回值：公钥哈希
 ```
 
-* 2.7 通过keystore获得私钥
+* 1.7 通过keystore获得私钥
 ```python
 from key_store import KeyStore
 
@@ -117,7 +99,7 @@ sk = keystore.parse("00000000")
 # 返回值：私钥
 ```
 
-* 2.8 通过私钥获得公钥
+* 1.8 通过私钥获得公钥
 ```python
 from utils import Utils
 
@@ -131,7 +113,7 @@ pk = Utils.ed25519_keypair(sk)
 # 返回值：公钥
 ```
 
-* 2.9 修改KeyStore密码方法
+* 1.9 修改KeyStore密码方法
 ```python
 from key_store import KeyStore
 
@@ -146,7 +128,7 @@ pk = KeyStore.create_key_store(pwd, sk)
 # 返回值：公钥
 ```
 
-* 2.10 SHA3-256哈希方法
+* 1.10 SHA3-256哈希方法
 ```python
 from utils import Utils
 
@@ -160,7 +142,7 @@ hash_plain = Utils.keccak256(hash_text)
 # 返回值：哈希值
 ```
 
-* 2.11 Ripemd-160哈希方法
+* 1.11 Ripemd-160哈希方法
 ```python
 from utils import Utils
 
@@ -174,7 +156,7 @@ hash_plain = Utils.ripmed160(hash_text)
 # 返回值：哈希值
 ```
 
-* 2.12 base58编码方法
+* 1.12 base58编码方法
 ```python
 from utils import Utils
 
@@ -188,7 +170,7 @@ text_encode = Utils.b58encode(text_bytes)
 # 返回值：哈希值
 ```
 
-* 2.13 创建原生转账事务
+* 1.13 创建原生转账事务
 ```python
 from tx_utility import TxUtility
 
@@ -210,7 +192,7 @@ transaction = tx_utility.create_transfer_tx(from_pubkey, to_pubkey_hash, amount,
 # 返回值：未签名的事务
 ```
 
-* 2.14 签名事务
+* 1.14 签名事务
 ```python
 from tx_utility import TxUtility
 
@@ -234,7 +216,7 @@ sign = tx_utility.sign_transaction(transaction, private_key)
 # 返回值：签名哈希
 ```
 
-* 2.15 构造存证事务
+* 1.15 构造存证事务
 ```python
 from tx_utility import TxUtility
 
@@ -255,7 +237,7 @@ transaction = tx_utility.create_transfer_prove_tx(from_pubkey, tx_payload, nonce
 # 返回值：未签名的事务
 ```
 
-* 2.16 构造投票事务
+* 1.16 构造投票事务
 ```python
 from tx_utility import TxUtility
 
@@ -277,7 +259,7 @@ transaction = tx_utility.create_transfer_vote_tx(from_pubkey, to_pubkey_hash, am
 # 返回值：未签名的事务
 ```
 
-* 2.17 构造投票撤回事务
+* 1.17 构造投票撤回事务
 ```python
 from tx_utility import TxUtility
 
@@ -301,7 +283,7 @@ transaction = tx_utility.create_transfer_vote_with_tx(from_pubkey, to_pubkey_has
 # 返回值：未签名的事务
 ```
 
-* 2.18 构造抵押事务
+* 1.18 构造抵押事务
 ```python
 from tx_utility import TxUtility
 
@@ -323,7 +305,7 @@ transaction = tx_utility.create_transfer_mortgage_tx(from_pubkey, to_pubkey_hash
 # 返回值：未签名的事务
 ```
 
-* 2.19 构造抵押撤回事务
+* 1.19 构造抵押撤回事务
 ```python
 from tx_utility import TxUtility
 
@@ -347,7 +329,7 @@ transaction = tx_utility.create_transfer_mortgage_with_tx(from_pubkey, to_pubkey
 # 返回值：未签名的事务
 ```
 
-* 2.20 部署资产定义事务
+* 1.20 部署资产定义事务
 ```python
 from tx_utility import TxUtility
 
@@ -378,7 +360,7 @@ transaction = tx_utility.create_deploy_for_rule_asset_tx(tx_from, tx_nonce, tx_c
 # 返回值：未签名的事务
 ```
 
-* 2.21 构造资产定义的更换所有者事务
+* 1.21 构造资产定义的更换所有者事务
 ```python
 from tx_utility import TxUtility
 
@@ -400,7 +382,7 @@ transaction = tx_utility.create_transfer_call_for_rule_asset_change_owner_tx(tx_
 # 返回值：未签名的事务
 ```
 
-* 2.22 构造资产定义的增发事务
+* 1.22 构造资产定义的增发事务
 ```python
 from tx_utility import TxUtility
 
@@ -422,7 +404,7 @@ transaction = tx_utility.create_transfer_call_for_rule_asset_increased_tx(tx_fro
 # 返回值：未签名的事务
 ```
 
-* 2.23 构造资产定义的转账事务
+* 1.23 构造资产定义的转账事务
 ```python
 from tx_utility import TxUtility
 
@@ -435,7 +417,7 @@ tx_amount = 10 * 100000000
 
 # 构造资产定义的转账事务
 tx_utility = TxUtility()
-transaction = tx_utility.create_transfer_call_for_rule_asset_increased_tx(tx_from, tx_hash, tx_nonce, tx_from_asset, tx_to_asset, tx_amount)
+transaction = tx_utility.create_transfer_deploy_for_rule_asset_tx(tx_from, tx_hash, tx_nonce, tx_from_asset, tx_to_asset, tx_amount)
 
 # 参数：
 #  1）、发送者公钥(bytes)
@@ -448,13 +430,13 @@ transaction = tx_utility.create_transfer_call_for_rule_asset_increased_tx(tx_fro
 # 返回值：未签名的事务
 ```
 
-* 2.24 构造签名的多重规则部署（发布者签名）
+* 1.24 构造签名的多重规则部署（发布者签名）
 ```python
 from tx_utility import TxUtility
 
 tx_from = b'tx_from'
 tx_nonce = 0 + 1
-tx_asset_hash = b'tx_from'
+tx_asset_hash = b'tx_asset_hash'
 tx_max = 10
 tx_min = 1
 tx_pub_list = [b'tx', b'pub', b'list']
@@ -472,6 +454,144 @@ transaction = tx_utility.create_multiple_for_rule_first_tx(tx_from, tx_nonce, tx
 #  4）、max(int   总计可以具备的签名数)
 #  5）、min(int   最少需要达到的签名数)
 #  6）、public_key_hash_list(bytes的集合  公钥数组)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.25 构造时间锁定的事务
+```python
+from tx_utility import TxUtility
+
+tx_from = b'tx_from'
+tx_nonce = 0 + 1
+tx_asset_hash = b'tx_asset_hash'
+tx_public_hash = b'tx_public_hash'
+# 构造时间锁定的事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_hash_time_block_for_deploy_tx(tx_from, tx_nonce, tx_asset_hash, tx_public_hash)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、nonce（int)
+#  3）、asset_hash(bytes 资产哈希)
+#  4）、public_hash(bytes 公钥哈希)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.26 构造获得锁定资产事务
+```python
+from tx_utility import TxUtility
+
+tx_from = b'tx_from'
+tx_hash = b'tx_hash'
+tx_nonce = 0 + 1
+tx_transfer_hash = b'tx_transfer_hash'
+tx_origin_text = b'tx_origin_text'
+# 构造获得锁定资产事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_hash_time_block_get_for_deploy_tx(tx_from, tx_hash, tx_nonce, tx_transfer_hash, tx_origin_text)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、事务哈希（bytes)
+#  3）、nonce（int)
+#  4）、transfer_hash(bytes 签发事务的哈希)
+#  5）、origin_text(bytes 原文)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.27 构造时间锁定的转发资产事务
+```python
+from tx_utility import TxUtility
+
+tx_from = b'tx_from'
+tx_hash = b'tx_hash'
+tx_nonce = 0 + 1
+tx_amount = 10 * 100000000
+tx_hash_result = b'tx_hash_result'
+tx_time_stamp = 10000
+# 构造时间锁定的转发资产事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_hash_time_block_transfer_for_deploy_tx(tx_from, tx_hash, tx_nonce, tx_amount, tx_hash_result, tx_time_stamp)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、事务哈希（bytes)
+#  3）、nonce（int)
+#  4）、amount(int 金额)
+#  5）、hash_result(bytes 原文)
+#  6）、time_stamp(时间戳)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.28 构造区块高度锁定支付的事务
+```python
+from tx_utility import TxUtility
+
+tx_from = b'tx_from'
+tx_nonce = 0 + 1
+tx_asset_hash = b'tx_asset_hash'
+tx_pubkey_hash = b'tx_pubkey_hash'
+# 构造区块高度锁定支付的事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_hash_height_block_for_deploy_tx(tx_from, tx_nonce, tx_asset_hash, tx_pubkey_hash)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、nonce（int)
+#  3）、asset_hash（bytes 资产哈希)
+#  4）、pubkey_hash(bytes 公钥哈希)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.29 构造区块高度锁定的获得锁定资产事务
+```python
+from tx_utility import TxUtility
+
+tx_from = b'tx_from'
+tx_hash = b'tx_hash'
+tx_nonce = 0 + 1
+tx_transfer_hash = b'tx_transfer_hash'
+tx_origin_text = b'tx_origin_text'
+# 构造区块高度锁定的获得锁定资产事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_hash_height_block_get_for_deploy_tx(tx_from, tx_hash, tx_nonce, tx_transfer_hash, tx_origin_text)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、事务哈希(bytes)
+#  3）、nonce（int)
+#  4）、transfer_hash（bytes 转账事务的哈希)
+#  5）、origin_text(bytes 原文)
+# 返回类型：Transaction(bytes)
+# 返回值：未签名的事务
+```
+
+* 2.30 构造区块高度锁定的转发资产事务
+```python
+from tx_utility import TxUtility
+
+tx_from = b'tx_from'
+tx_hash = b'tx_hash'
+tx_nonce = 0 + 1
+tx_amount = 10 * 100000000
+tx_hash_result = b'tx_hash_result'
+tx_block_height = 10
+# 构造区块高度锁定的转发资产事务
+tx_utility = TxUtility()
+transaction = tx_utility.create_hash_height_block_transfer_for_deploy_tx(tx_from, tx_hash, tx_nonce, tx_amount, tx_hash_result, tx_block_height)
+
+# 参数：
+#  1）、发送者公钥(bytes)
+#  2）、事务哈希(bytes)
+#  3）、nonce（int)
+#  4）、amount（int 金额)
+#  5）、hash_result（bytes 原文)
+#  6）、block_height(int)
 # 返回类型：Transaction(bytes)
 # 返回值：未签名的事务
 ```
