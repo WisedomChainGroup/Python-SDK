@@ -7,7 +7,7 @@ from key_store import KeyStore
 pwd = str("00000000")
 
 key_store = KeyStore.create_key_store(pwd)
-print(KeyStore.from_json(key_store).as_dict())
+key_store_json_str = key_store.as_dict()
 # 参数：
 #  1）、密码（str)
 # 返回类型：KeyStore json str
