@@ -77,7 +77,7 @@ class KeyStore:
         self.kdf_params = KdfParams()
 
     def parse(self, password: str) -> bytes:
-        argon_hash = Utils.argon2_hash(associated_data=self.kdf_params.salt + password.encode(), salt=self.kdf_params.salt)
+        argon_hash = Utils.argon2_hash(associated_data=self.kdf_params.salt.hex().encode('ascii') + password.encode('ascii'), salt=self.kdf_params.salt.hex().encode('ascii'))
         sk = Utils.decrypt_data(self.crypto.cipher_text, argon_hash, self.crypto.cipher_params.iv)
         return sk
 
@@ -116,7 +116,7 @@ class KeyStore:
         sk, pk = Utils.ed25519_keypair(sk)
         salt = Utils.random_bytes(32)
         iv = Utils.random_bytes(16)
-        argon_hash = Utils.argon2_hash(associated_data=salt + password.encode(), salt=salt)
+        argon_hash = Utils.argon2_hash(associated_data=salt.hex().encode('ascii') + password.encode('ascii'), salt=salt.hex().encode('ascii'))
         address = Utils.pubkey_to_address(pk)
         aes = Utils.encrypt_data(sk, argon_hash, iv)
         mac = Utils.keccak256(argon_hash + aes)
@@ -137,18 +137,15 @@ class KeyPair:
 
 
 if __name__ == '__main__':
-    a = """ {"address": "WX1GPpYX1gPSkcuemo9CkHMQabjWnVnoHJPT", 
-    "id": "9cf0f3fd-9976-11ea-aa30-04d4c44dc4c5", 
-    "version": "2", 
-    "mac": "2e513fb52e59e9aca0dee97eb4a0db7844444fa3dc764dc03d3401d026af5770", 
-    "kdfparams": {"salt": "6a389d4f1e966835c52710d95eb13491ffc3c1ae329a26a823cc2aef083cce27", 
-        "memoryCost": 20480, 
-        "parallelism": 2, 
-        "timeCost": 4}, 
-    "crypto": {"cipher": "aes-256-ctr", 
-        "ciphertext": "9dee7d0462e8204140b3bb4585d7f87d54ae0ce34a39d49a441c084eeed4e784", 
-        "cipherparams": {"iv": "0c466273542f3982736e516d49e0d07c"}}, 
-    "kdf": "argon2id"}
+    a = """ {
+"address":"WX1HbnUXUXYfEnsqe2Rkd2Xoqw5Rns1xHv2F",
+"kdfparams":{"salt":"1f696b3c6c475572cd9d52b886c9a940e243f1dcc42c75072d8c72cffaaa7e11","memoryCost":20480,"parallelism":2,"timeCost":4},
+"id":"d60794af-a68e-4a01-b307-32971cad2835",
+"kdf":"argon2id",
+"version":"2",
+"mac":"5c3f7957075edcf93b6d2d0aa6d464f01f2931a7113886d57479eee52f19efe5",
+"crypto":{"cipher":"aes-256-ctr","ciphertext":"f7e212e182a34ce27b02ca207c9c04a7ad12d6d414ec91856cd8a45123384908","cipherparams":{"iv":"fb03038ffe85bf70398fc1e445026d3b"}}
+}
     """
     key_store = KeyStore.create_key_store("00000000")
     print(key_store.as_dict())
