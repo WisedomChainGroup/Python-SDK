@@ -79,6 +79,10 @@ class KeyStore:
     def parse(self, password: str) -> bytes:
         argon_hash = Utils.argon2_hash(associated_data=self.kdf_params.salt.hex().encode('ascii') + password.encode('ascii'), salt=self.kdf_params.salt.hex().encode('ascii'))
         sk = Utils.decrypt_data(self.crypto.cipher_text, argon_hash, self.crypto.cipher_params.iv)
+        aes = Utils.encrypt_data(sk, argon_hash, self.crypto.cipher_params.iv)
+        mac = Utils.keccak256(argon_hash + aes)
+        if mac != self.mac:
+            raise BaseException('invalid password verify failed')
         return sk
 
     def as_dict(self) -> dict:
@@ -150,7 +154,7 @@ if __name__ == '__main__':
     key_store = KeyStore.create_key_store("00000000")
     print(key_store.as_dict())
     keystore = KeyStore.from_json(a)
-    sk = keystore.parse("00000000")
+    sk = keystore.parse("12345678")
     print(sk.hex())
     pubkey_hash = Utils.address_to_pubkey_hash('WX1GPpYX1gPSkcuemo9CkHMQabjWnVnoHJPT')
     print(pubkey_hash.hex())
