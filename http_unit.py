@@ -13,10 +13,8 @@ class HttpUnit:
         headers = {"accept": "*/*", "connection": "Keep-Alive", "user-agent": "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)"}
         conn.request("POST", all_route, None, headers)
         response = conn.getresponse()
-        print(response.status, response.reason)
         data = response.read()
         conn.close()
-        print(data)
         return data
 
 
