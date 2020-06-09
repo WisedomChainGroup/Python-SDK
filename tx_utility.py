@@ -40,9 +40,33 @@ TYPE_LIST_EIGHT = ["HASH_HEIGHT_BLOCK_GET_FOR_DEPLOY"]
 DEFAULT_VERSION = 1
 
 
+class HashTimeBlock:
+    def __init__(self, htb_assetHash: bytes = b'', htb_pubkeyHash: bytes = b''):
+        self.htb_assetHash = htb_assetHash
+        self.htb_pubkeyHash = htb_pubkeyHash
+
+    @classmethod
+    def _from_list(cls, d: []):
+        ret = cls()
+        ret.htb_assetHash = d[0].decode()
+        ret.htb_pubkeyHash = d[1].decode()
+        return ret
+
+    def rlp_decode(self, b: bytes):
+        data = rlp.decode(b)
+        ret = self._from_list(data)
+        return ret
+
+
 class Multiple:
-    def __init__(self, m_asset_hash: bytes = b'', m_max: int = 0, m_min: int = 0, m_pub_list=[],
-                 m_signatures=[], m_pubkey_hash_list=[]):
+    def __init__(self, m_asset_hash: bytes = b'', m_max: int = 0, m_min: int = 0, m_pub_list=None,
+                 m_signatures=None, m_pubkey_hash_list=None):
+        if m_pub_list is None:
+            m_pub_list = []
+        if m_signatures is None:
+            m_signatures = []
+        if m_pubkey_hash_list is None:
+            m_pubkey_hash_list = []
         self.m_asset_hash = m_asset_hash
         self.m_max = m_max
         self.m_min = m_min
@@ -50,10 +74,32 @@ class Multiple:
         self.m_signatures = m_signatures
         self.m_pubkey_hash_list = m_pubkey_hash_list
 
+    @classmethod
+    def _from_list(cls, d: []):
+        ret = cls()
+        ret.m_asset_hash = d[0].decode()
+        ret.m_max = Utils.decode_u32(d[1])
+        ret.m_min = Utils.decode_u32(d[2])
+        ret.m_pub_list = d[3].decode()
+        ret.m_signatures = d[4].decode()
+        ret.m_pubkey_hash_list = d[5].decode()
+        return ret
+
+    def rlp_decode(self, b: bytes):
+        data = rlp.decode(b)
+        ret = self._from_list(data)
+        return ret
+
 
 class MultipleTransfer:
-    def __init__(self, mt_origin: int = 0, mt_dest: int = 0, mt_from=[], mt_signatures=[],
-                 mt_to: bytes = b'', mt_value: int = 0, mt_pubkey_hash_list=[]):
+    def __init__(self, mt_origin: int = 0, mt_dest: int = 0, mt_from=None, mt_signatures=None,
+                 mt_to: bytes = b'', mt_value: int = 0, mt_pubkey_hash_list=None):
+        if mt_from is None:
+            mt_from = []
+        if mt_signatures is None:
+            mt_signatures = []
+        if mt_pubkey_hash_list is None:
+            mt_pubkey_hash_list = []
         self.mt_origin = mt_origin
         self.mt_dest = mt_dest
         self.mt_from = mt_from
@@ -61,6 +107,23 @@ class MultipleTransfer:
         self.mt_to = mt_to
         self.mt_value = mt_value
         self.mt_pubkey_hash_list = mt_pubkey_hash_list
+
+    @classmethod
+    def _from_list(cls, d: []):
+        ret = cls()
+        ret.mt_origin = d[0].decode()
+        ret.mt_dest = d[1].decode()
+        ret.mt_from = d[2].decode()
+        ret.mt_signatures = d[3].decode()
+        ret.mt_to = d[4].decode()
+        ret.mt_value = d[5].decode()
+        ret.mt_pubkey_hash_list = d[6].decode()
+        return ret
+
+    def rlp_decode(self, b: bytes):
+        data = rlp.decode(b)
+        ret = self._from_list(data)
+        return ret
 
 
 class Asset:
@@ -75,22 +138,18 @@ class Asset:
         self.at_info = at_info
 
     def _get_list(self) -> []:
-        at_code_encode = self.at_code.encode()
-        at_offering_encode = Utils.encode_u8(self.at_offering)
-        at_total_amount_encode = Utils.encode_u8(self.at_total_amount)
-        at_allow_increase_encode = Utils.encode_u8(self.at_allow_increase)
-        ret = [at_code_encode, at_offering_encode, at_total_amount_encode, self.at_create_user, self.at_owner, at_allow_increase_encode, self.at_info]
+        ret = [self.at_code, self.at_offering, self.at_total_amount, self.at_create_user, self.at_owner, self.at_allow_increase, self.at_info]
         return ret
 
     @classmethod
     def _from_list(cls, d: []):
         ret = cls()
         ret.at_code = d[0].decode()
-        ret.at_offering = Utils.decode_u32(d[1])
-        ret.at_total_amount = Utils.decode_u32(d[2])
+        ret.at_offering = d[1].decode()
+        ret.at_total_amount = d[2].decode()
         ret.at_create_user = d[3].decode()
         ret.at_owner = d[4].decode()
-        ret.at_allow_increase = Utils.decode_u32(d[5])
+        ret.at_allow_increase = d[5].decode()
         ret.at_info = d[6].decode()
         return ret
 
