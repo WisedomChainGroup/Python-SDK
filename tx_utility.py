@@ -431,8 +431,7 @@ class TxUtility:
             tx_amount=0
         )
         tx.tx_to = Utils.ripmed160(tx_hash)
-        tx_amount_encode = Utils.encode_u8(tx_amount)
-        tx.payload = rlp.encode(tx_amount_encode)
+        tx.payload = rlp.encode(tx_amount)
         tx.gas_price = round(FEE / GAS_TABLE[2])
         return tx
 
@@ -456,8 +455,7 @@ class TxUtility:
             tx_amount=0
         )
         tx.tx_to = Utils.ripmed160(tx_hash)
-        tx_amount_encode = Utils.encode_u8(tx_amount)
-        tx_rlp = [tx_from_asset, tx_to_asset, tx_amount_encode]
+        tx_rlp = [tx_from_asset, tx_to_asset, tx_amount]
         tx.payload = rlp.encode(tx_rlp)
         tx.gas_price = round(FEE / GAS_TABLE[2])
         return tx
@@ -484,9 +482,7 @@ class TxUtility:
             tx_amount=0
         )
         tx.tx_to = bytes(20)
-        tx_max_encode = Utils.encode_u8(tx_max)
-        tx_min_encode = Utils.encode_u8(tx_min)
-        tx_rlp = [tx_asset_hash, tx_max_encode, tx_min_encode, tx_pub_list, tx_signatures, tx_public_key_hash_list]
+        tx_rlp = [tx_asset_hash, tx_max, tx_min, tx_pub_list, tx_signatures, tx_public_key_hash_list]
         tx.payload = rlp.encode(tx_rlp)
         tx.gas_price = round(FEE / GAS_TABLE[2])
         return tx
@@ -513,9 +509,7 @@ class TxUtility:
             tx_amount=0
         )
         tx.tx_to = bytes(20)
-        tx_max_encode = Utils.encode_u8(tx_max)
-        tx_min_encode = Utils.encode_u8(tx_min)
-        tx_rlp = [tx_asset_hash, tx_max_encode, tx_min_encode, tx_pub_list, tx_signatures, tx_public_key_hash_list]
+        tx_rlp = [tx_asset_hash, tx_max, tx_min, tx_pub_list, tx_signatures, tx_public_key_hash_list]
         tx.payload = rlp.encode(tx_rlp)
         tx.gas_price = round(FEE / GAS_TABLE[2])
         return tx
@@ -544,10 +538,7 @@ class TxUtility:
             tx_amount=0
         )
         tx.tx_to = Utils.ripmed160(tx_hash)
-        tx_origin_encode = Utils.encode_u8(tx_origin)
-        tx_dest_encode = Utils.encode_u8(tx_dest)
-        tx_amount_encode = Utils.encode_u8(tx_amount)
-        tx_rlp = [tx_origin_encode, tx_dest_encode, tx_from_list, tx_signatures, tx_to_list, tx_amount_encode, tx_public_key_hash_list]
+        tx_rlp = [tx_origin, tx_dest, tx_from_list, tx_signatures, tx_to_list, tx_amount, tx_public_key_hash_list]
         tx.payload = rlp.encode(tx_rlp)
         tx.gas_price = round(FEE / GAS_TABLE[2])
         return tx
@@ -620,9 +611,7 @@ class TxUtility:
         )
         tx.gas_price = round(FEE / GAS_TABLE[2])
         tx.tx_to = Utils.ripmed160(tx_hash)
-        tx_amount_encode = Utils.encode_u8(tx_amount)
-        tx_time_stamp_encode = Utils.encode_u8(tx_time_stamp)
-        tx_rlp = [tx_amount_encode, tx_hash_result, tx_time_stamp_encode]
+        tx_rlp = [tx_amount, tx_hash_result, tx_time_stamp]
         tx.payload = rlp.encode(tx_rlp)
         return tx
 
@@ -694,9 +683,7 @@ class TxUtility:
         )
         tx.gas_price = round(FEE / GAS_TABLE[2])
         tx.tx_to = Utils.ripmed160(tx_hash)
-        tx_amount_encode = Utils.encode_u8(tx_amount)
-        tx_block_height_encode = Utils.encode_u8(tx_block_height)
-        tx_rlp = [tx_amount_encode, tx_hash_result, tx_block_height_encode]
+        tx_rlp = [tx_amount, tx_hash_result, tx_block_height]
         tx.payload = rlp.encode(tx_rlp)
         return tx
 
