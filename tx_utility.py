@@ -409,7 +409,8 @@ class TxUtility:
             tx_amount=0
         )
         tx.tx_to = Utils.ripmed160(tx_hash)
-        tx.payload = rlp.encode(tx_new_owner)
+        tx_rlp = [tx_new_owner]
+        tx.payload = rlp.encode(tx_rlp)
         tx.gas_price = round(FEE / GAS_TABLE[2])
         return tx
 
