@@ -353,7 +353,7 @@ transaction = tx_utility.create_deploy_for_rule_asset_tx(tx_from, tx_nonce, tx_c
 #  3）、code(str，资产代码)
 #  4）、offering（int，期初发行额度)
 #  5）、create_user(bytes，规则创建者的公钥)
-#  6）、owner（bytes，规则所有者的地址)
+#  6）、owner（bytes，规则所有者的公钥哈希)
 #  7）、allow_increase(int 是否允许增发 1表示允许，0表示不允许)
 #  8）、info(string 说明)
 # 返回类型：Transaction(bytes)
@@ -377,7 +377,7 @@ transaction = tx_utility.create_transfer_call_for_rule_asset_change_owner_tx(tx_
 #  1）、发送者公钥(bytes)
 #  2）、事务哈希(bytes)
 #  3）、nonce(int)
-#  4）、new_owner(bytes，新的目标用户地址)
+#  4）、new_owner(bytes，新的目标用户公钥哈希)
 # 返回类型：Transaction(bytes)
 # 返回值：未签名的事务
 ```
