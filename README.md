@@ -487,7 +487,7 @@ tx_from = b'tx_from'
 tx_hash = b'tx_hash'
 tx_nonce = 0 + 1
 tx_transfer_hash = b'tx_transfer_hash'
-tx_origin_text = b'tx_origin_text'
+tx_origin_text = 'tx_origin_text'
 # 构造获得锁定资产事务
 tx_utility = TxUtility()
 transaction = tx_utility.create_hash_time_block_get_for_deploy_tx(tx_from, tx_hash, tx_nonce, tx_transfer_hash, tx_origin_text)
@@ -497,7 +497,7 @@ transaction = tx_utility.create_hash_time_block_get_for_deploy_tx(tx_from, tx_ha
 #  2）、事务哈希（bytes)
 #  3）、nonce（int)
 #  4）、transfer_hash(bytes 签发事务的哈希)
-#  5）、origin_text(bytes 原文)
+#  5）、origin_text(str 原文)
 # 返回类型：Transaction(bytes)
 # 返回值：未签名的事务
 ```
@@ -556,7 +556,7 @@ tx_from = b'tx_from'
 tx_hash = b'tx_hash'
 tx_nonce = 0 + 1
 tx_transfer_hash = b'tx_transfer_hash'
-tx_origin_text = b'tx_origin_text'
+tx_origin_text = 'tx_origin_text'
 # 构造区块高度锁定的获得锁定资产事务
 tx_utility = TxUtility()
 transaction = tx_utility.create_hash_height_block_get_for_deploy_tx(tx_from, tx_hash, tx_nonce, tx_transfer_hash, tx_origin_text)
@@ -566,7 +566,7 @@ transaction = tx_utility.create_hash_height_block_get_for_deploy_tx(tx_from, tx_
 #  2）、事务哈希(bytes)
 #  3）、nonce（int)
 #  4）、transfer_hash（bytes 转账事务的哈希)
-#  5）、origin_text(bytes 原文)
+#  5）、origin_text(str 原文)
 # 返回类型：Transaction(bytes)
 # 返回值：未签名的事务
 ```

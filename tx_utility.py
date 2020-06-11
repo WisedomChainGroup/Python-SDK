@@ -7,6 +7,8 @@ import rlp
 
 GAS_TABLE = [0, 50000, 100000, 20000]
 FEE = 200000
+RATE = 100000000
+NONCE = 1
 TYPE_DICT = {
                 "TRANSFER": 1,
                 "TRANSFER_VOTE": 2,
@@ -167,11 +169,11 @@ class Transaction:
                  tx_nonce: int = 0, tx_amount: int = 0, payload: bytes = b'', tx_to: bytes = b'', sig: bytes = b''):
         self.version = version
         self.tx_type = tx_type
-        self.tx_nonce = tx_nonce
+        self.tx_nonce = tx_nonce + NONCE
         self.tx_from = tx_from
         self.gas_price = gas_price
         self.version = version
-        self.tx_amount = tx_amount
+        self.tx_amount = tx_amount * RATE
         self.payload = payload
         self.tx_to = tx_to
         self.sig = sig
@@ -569,14 +571,14 @@ class TxUtility:
         return tx
 
     @staticmethod
-    def create_hash_time_block_get_for_deploy_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_transfer_hash: bytes, tx_origin_text: bytes) -> Transaction:
+    def create_hash_time_block_get_for_deploy_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_transfer_hash: bytes, tx_origin_text: str) -> Transaction:
         """
             构造获得锁定资产事务
             :param tx_from: bytes
             :param tx_hash: bytes
             :param tx_nonce: int
             :param tx_transfer_hash: bytes
-            :param tx_origin_text: bytes
+            :param tx_origin_text: str
             :return: Transaction
         """
         tx = Transaction(
@@ -641,14 +643,14 @@ class TxUtility:
         return tx
 
     @staticmethod
-    def create_hash_height_block_get_for_deploy_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_transfer_hash: bytes, tx_origin_text: bytes) -> Transaction:
+    def create_hash_height_block_get_for_deploy_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_transfer_hash: bytes, tx_origin_text: str) -> Transaction:
         """
             构造区块高度锁定的获得锁定资产事务
             :param tx_from: bytes
             :param tx_hash: bytes
             :param tx_nonce: int
             :param tx_transfer_hash: bytes
-            :param tx_origin_text: bytes
+            :param tx_origin_text: str
             :return: Transaction
         """
         tx = Transaction(
