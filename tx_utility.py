@@ -571,7 +571,7 @@ class TxUtility:
         return tx
 
     @staticmethod
-    def create_hash_time_block_get_for_deploy_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_transfer_hash: bytes, tx_origin_text: str) -> Transaction:
+    def create_hash_time_block_get_for_deploy_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_transfer_hash: bytes, tx_origin_text: str = '') -> Transaction:
         """
             构造获得锁定资产事务
             :param tx_from: bytes
@@ -590,7 +590,8 @@ class TxUtility:
         )
         tx.gas_price = round(FEE / GAS_TABLE[2])
         tx.tx_to = Utils.ripmed160(tx_hash)
-        tx_rlp = [tx_transfer_hash, tx_origin_text]
+        tx_origin_text_new = cheack_origin_text(tx_origin_text)
+        tx_rlp = [tx_transfer_hash, tx_origin_text_new]
         tx.payload = rlp.encode(tx_rlp)
         return tx
 
@@ -643,7 +644,7 @@ class TxUtility:
         return tx
 
     @staticmethod
-    def create_hash_height_block_get_for_deploy_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_transfer_hash: bytes, tx_origin_text: str) -> Transaction:
+    def create_hash_height_block_get_for_deploy_tx(tx_from: bytes, tx_hash: bytes, tx_nonce: int, tx_transfer_hash: bytes, tx_origin_text: str = '') -> Transaction:
         """
             构造区块高度锁定的获得锁定资产事务
             :param tx_from: bytes
@@ -662,7 +663,8 @@ class TxUtility:
         )
         tx.gas_price = round(FEE / GAS_TABLE[2])
         tx.tx_to = Utils.ripmed160(tx_hash)
-        tx_rlp = [tx_transfer_hash, tx_origin_text]
+        tx_origin_text_new = cheack_origin_text(tx_origin_text)
+        tx_rlp = [tx_transfer_hash, tx_origin_text_new]
         tx.payload = rlp.encode(tx_rlp)
         return tx
 
@@ -690,6 +692,15 @@ class TxUtility:
         tx_rlp = [tx_amount, tx_hash_result, tx_block_height]
         tx.payload = rlp.encode(tx_rlp)
         return tx
+
+def cheack_origin_text(tx_origin_text: str) -> str:
+    if tx_origin_text == '':
+        raise BaseException("origintext can not be null")
+    tx_origin_text_new = tx_origin_text.replace(" ", "")
+    tx_origin_text_encode = tx_origin_text_new.encode()
+    if len(tx_origin_text_encode) > 512 or len(tx_origin_text_encode) <= 0:
+        raise BaseException("origintext length is too large or too short")
+    return tx_origin_text_new
 
 
 if __name__ == '__main__':
