@@ -8,7 +8,7 @@ import argon2
 import base58
 import nacl.bindings
 from Crypto.Cipher import AES
-from Crypto.Hash import RIPEMD160
+from Crypto.Hash import RIPEMD160, SHA3_256
 from Crypto.Hash import keccak
 from Crypto.Util import Counter
 from nacl.utils import random
@@ -111,6 +111,17 @@ class Utils:
         :return: digest
         """
         h = RIPEMD160.new()
+        h.update(data)
+        return h.digest()
+
+    @staticmethod
+    def sha3256(data: bytes) -> bytes:
+        """
+        sha3 hash
+        :param data: source data
+        :return: digest
+        """
+        h = SHA3_256.new()
         h.update(data)
         return h.digest()
 
