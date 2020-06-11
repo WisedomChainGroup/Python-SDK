@@ -616,7 +616,8 @@ class TxUtility:
         )
         tx.gas_price = round(FEE / GAS_TABLE[2])
         tx.tx_to = Utils.ripmed160(tx_hash)
-        tx_rlp = [tx_amount, tx_hash_result, tx_time_stamp]
+        tx_amount_in = tx_amount * RATE
+        tx_rlp = [tx_amount_in, tx_hash_result, tx_time_stamp]
         tx.payload = rlp.encode(tx_rlp)
         return tx
 
