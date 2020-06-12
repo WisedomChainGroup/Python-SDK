@@ -45,13 +45,13 @@ pubkey_hash = Utils().address_to_pubkey_hash(address)
 
 * 1.4 通过公钥哈希获得地址
 ```python
-from utils import Utils
+from key_store import KeyStore
 
 pubkey_hash = "pubkey_hash"
 
-address = Utils().get_address_from_pubkey_hash(pubkey_hash)
+address = KeyStore.get_address_from_pubkey_hash(pubkey_hash)
 # 参数：
-#  1）、公钥哈希（bytes)
+#  1）、公钥哈希（str)
 # 返回类型：str
 # 返回值：address(地址)
 ```
@@ -73,14 +73,14 @@ address = store["address"]
 
 * 1.6 通过地址获得公钥哈希
 ```python
-from utils import Utils
+from key_store import KeyStore
 
 address = "address"
 # 获得公钥哈希
-pubkey_hash = Utils.address_to_pubkey_hash(address)
+pubkey_hash = KeyStore.get_pubkey_hash_from_address(address)
 # 参数：
 #  1）、address str
-# 返回类型：bytes
+# 返回类型：str
 # 返回值：公钥哈希
 ```
 
@@ -95,21 +95,21 @@ keystore = KeyStore.from_json(keystore_json_str)
 sk = keystore.parse("00000000")
 # 参数：
 #  1）、keystore json str
-# 返回类型：bytes
+# 返回类型：str
 # 返回值：私钥
 ```
 
 * 1.8 通过私钥获得公钥
 ```python
-from utils import Utils
+from key_store import KeyStore
 
-sk = b"private_key"
+sk = "private_key"
 
 # 获得公钥
-pk = Utils.ed25519_keypair(sk)
+pk = KeyStore.get_pk_from_sk(sk)
 # 参数：
 #  1）、sk(私钥)
-# 返回类型：bytes
+# 返回类型：str
 # 返回值：公钥
 ```
 

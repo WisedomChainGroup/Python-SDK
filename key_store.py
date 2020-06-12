@@ -76,14 +76,14 @@ class KeyStore:
         self.kdf = kdf
         self.kdf_params = KdfParams()
 
-    def parse(self, password: str) -> bytes:
+    def parse(self, password: str) -> str:
         argon_hash = Utils.argon2_hash(associated_data=self.kdf_params.salt.hex().encode('ascii') + password.encode('ascii'), salt=self.kdf_params.salt.hex().encode('ascii'))
         sk = Utils.decrypt_data(self.crypto.cipher_text, argon_hash, self.crypto.cipher_params.iv)
         aes = Utils.encrypt_data(sk, argon_hash, self.crypto.cipher_params.iv)
         mac = Utils.keccak256(argon_hash + aes)
         if mac != self.mac:
             raise BaseException('invalid password verify failed')
-        return sk
+        return sk.hex()
 
     def as_dict(self) -> dict:
         return {
@@ -131,15 +131,32 @@ class KeyStore:
         key_store.kdf_params = KdfParams(salt=salt)
         return key_store
 
-
-class KeyPair:
+    @staticmethod
+    def get_address_from_pubkey_hash(public_hash: str) -> str:
+        """
+        convert public key hash to address
+        :param public_hash:
+        :return:
+        """
+        public_hash_bytes = bytes.fromhex(public_hash)
+        address = Utils.pubkey_hash_to_address(public_hash_bytes)
+        return address
 
     @staticmethod
-    def get_key() -> Tuple[bytes, bytes]:
-        seed = random(nacl.bindings.crypto_sign_SEEDBYTES)
-        secret_key = seed
-        public, _ = nacl.bindings.crypto_sign_seed_keypair(seed)
-        return secret_key, public
+    def get_pubkey_hash_from_address(address: str) -> str:
+        """
+        convert address to public key hash
+        :param address:
+        :return:
+        """
+        pubkey_hash = Utils.address_to_pubkey_hash(address)
+        return pubkey_hash.hex()
+
+    @staticmethod
+    def get_pk_from_sk(sk: str) -> str:
+        sk_bytes = bytes.fromhex(sk)
+        pk = Utils.ed25519_keypair(sk_bytes)
+        return pk[1].hex()
 
 
 if __name__ == '__main__':

@@ -168,17 +168,6 @@ class Utils:
         return s6
 
     @staticmethod
-    def get_address_from_pubkey_hash(public_hash: str) -> str:
-        """
-        convert public key hash to address
-        :param public_hash:
-        :return:
-        """
-        public_hash_bytes = bytes.fromhex(public_hash)
-        address = Utils.pubkey_hash_to_address(public_hash_bytes)
-        return address
-
-    @staticmethod
     def __int_of_string(s):
         return int(binascii.hexlify(s), 16)
 
