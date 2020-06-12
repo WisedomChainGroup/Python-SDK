@@ -222,7 +222,8 @@ class Transaction:
     def get_hash(self) -> bytes:
         return Utils.keccak256(self.get_raw_for_hash())
 
-    def get_transinfo(self) -> str:
+    def get_transinfo(self, prikey: bytes) -> str:
+        self.sig = nacl.signing.SigningKey(prikey).sign(self.get_raw_for_sign())[0:-len(self.get_raw_for_sign())]
         trans_for_hash = self.get_raw_for_hash()
         trans_hash = self.get_hash()
         result = trans_for_hash.hex()[0:2] + trans_hash.hex() + trans_for_hash.hex()[2:]
@@ -648,7 +649,7 @@ class TxUtility:
             tx_amount=0
         )
         tx.gas_price = round(FEE / GAS_TABLE[2])
-        tx.tx_to = bytes(40)
+        tx.tx_to = bytes(20)
         tx_rlp = [tx_asset_hash, tx_pubkey_hash]
         tx.payload = rlp.encode(tx_rlp)
         return tx
@@ -734,4 +735,4 @@ if __name__ == '__main__':
     print('b.get_hash: ' + b.get_hash().hex())
     print('b.get_raw_for_hash: ' + b.get_raw_for_hash().hex())
     print(b.get_raw_for_hash().hex()[0:2] + b.get_hash().hex() + b.get_raw_for_hash().hex()[2:])
-    print(b.get_transinfo())
+    print(b.get_transinfo(prikey))
