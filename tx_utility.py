@@ -389,8 +389,8 @@ class TxUtility:
         tx.tx_to = bytes(20)
         at = Asset(
             at_code=tx_code,
-            at_offering=tx_offering,
-            at_total_amount=tx_total_amount,
+            at_offering=tx_offering * RATE,
+            at_total_amount=tx_total_amount * RATE,
             at_create_user=tx_create_user,
             at_owner=tx_owner,
             at_allow_increase=tx_allow_increase,
