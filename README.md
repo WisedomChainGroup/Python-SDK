@@ -4,7 +4,7 @@
 ```python
 from key_store import KeyStore
 
-pwd = str("00000000")
+pwd = "00000000"
 
 key_store = KeyStore.create_key_store(pwd)
 key_store_json_str = key_store.as_dict()
@@ -19,7 +19,7 @@ key_store_json_str = key_store.as_dict()
 ```python
 from utils import Utils
 
-address = str("address")
+address = "address"
 
 pubkey_hash = Utils().address_to_pubkey_hash(address)
 # 参数：
@@ -34,7 +34,7 @@ pubkey_hash = Utils().address_to_pubkey_hash(address)
 ```python
 from utils import Utils
 
-address = str("address")
+address = "address"
 
 pubkey_hash = Utils().address_to_pubkey_hash(address)
 # 参数：
@@ -47,9 +47,9 @@ pubkey_hash = Utils().address_to_pubkey_hash(address)
 ```python
 from utils import Utils
 
-pubkey_hash = b"pubkey_hash"
+pubkey_hash = "pubkey_hash"
 
-address = Utils().pubkey_hash_to_address(pubkey_hash)
+address = Utils().get_address_from_pubkey_hash(pubkey_hash)
 # 参数：
 #  1）、公钥哈希（bytes)
 # 返回类型：str
@@ -60,7 +60,7 @@ address = Utils().pubkey_hash_to_address(pubkey_hash)
 ```python
 from key_store import KeyStore
 
-key_store = str("key store json str")
+key_store = "key store json str"
 
 store = KeyStore.from_json(key_store).as_dict()
 # 获得地址
@@ -75,7 +75,7 @@ address = store["address"]
 ```python
 from utils import Utils
 
-address = str("address")
+address = "address"
 # 获得公钥哈希
 pubkey_hash = Utils.address_to_pubkey_hash(address)
 # 参数：
@@ -88,7 +88,7 @@ pubkey_hash = Utils.address_to_pubkey_hash(address)
 ```python
 from key_store import KeyStore
 
-keystore_json_str = str("keystore json str")
+keystore_json_str = "keystore json str"
 keystore = KeyStore.from_json(keystore_json_str)
     
 # 获得私钥
@@ -117,7 +117,7 @@ pk = Utils.ed25519_keypair(sk)
 ```python
 from key_store import KeyStore
 
-pwd = str("new password")
+pwd = "new password"
 sk = b"private_key"
 
 # 获得公钥
@@ -335,7 +335,7 @@ from tx_utility import TxUtility
 
 tx_from = b'tx_from'
 tx_nonce = 0 + 1
-tx_code = str("tx_code")
+tx_code = "tx_code"
 tx_offering = 10 * 100000000
 tx_total_amount = 10 * 100000000
 tx_create_user = b'tx_create_user'
