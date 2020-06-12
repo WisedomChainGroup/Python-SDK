@@ -117,6 +117,8 @@ class KeyStore:
 
     @classmethod
     def create_key_store(cls, password: str, sk: bytes = b''):
+        if len(password) < 8 or len(password) > 20:
+            raise BaseException('password len not from 8 to 20')
         sk, pk = Utils.ed25519_keypair(sk)
         salt = Utils.random_bytes(32)
         iv = Utils.random_bytes(16)
@@ -157,6 +159,8 @@ if __name__ == '__main__':
     sk = keystore.parse("12345678")
     print(sk.hex())
     pubkey_hash = Utils.address_to_pubkey_hash('WX1GPpYX1gPSkcuemo9CkHMQabjWnVnoHJPT')
-    print(pubkey_hash.hex())
+    print(pubkey_hash)
     sk, pk = Utils.ed25519_keypair(sk)
     print(pk.hex())
+    address = Utils.get_address_from_pubkey_hash(pubkey_hash.hex())
+    print(address)
