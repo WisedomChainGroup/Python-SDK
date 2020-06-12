@@ -222,6 +222,12 @@ class Transaction:
     def get_hash(self) -> bytes:
         return Utils.keccak256(self.get_raw_for_hash())
 
+    def get_transinfo(self) -> str:
+        trans_for_hash = self.get_raw_for_hash()
+        trans_hash = self.get_hash()
+        result = trans_for_hash.hex()[0:2] + trans_hash.hex() + trans_for_hash.hex()[2:]
+        return result
+
 
 class TxUtility:
 
@@ -593,7 +599,7 @@ class TxUtility:
         )
         tx.gas_price = round(FEE / GAS_TABLE[2])
         tx.tx_to = Utils.ripmed160(tx_hash)
-        tx_origin_text_new = cheack_origin_text(tx_origin_text)
+        tx_origin_text_new = check_origin_text(tx_origin_text)
         tx_rlp = [tx_transfer_hash, tx_origin_text_new]
         tx.payload = rlp.encode(tx_rlp)
         return tx
@@ -667,7 +673,7 @@ class TxUtility:
         )
         tx.gas_price = round(FEE / GAS_TABLE[2])
         tx.tx_to = Utils.ripmed160(tx_hash)
-        tx_origin_text_new = cheack_origin_text(tx_origin_text)
+        tx_origin_text_new = check_origin_text(tx_origin_text)
         tx_rlp = [tx_transfer_hash, tx_origin_text_new]
         tx.payload = rlp.encode(tx_rlp)
         return tx
@@ -698,7 +704,8 @@ class TxUtility:
         tx.payload = rlp.encode(tx_rlp)
         return tx
 
-def cheack_origin_text(tx_origin_text: str) -> str:
+
+def check_origin_text(tx_origin_text: str) -> str:
     if tx_origin_text == '':
         raise BaseException("origintext can not be null")
     tx_origin_text_new = tx_origin_text.replace(" ", "")
@@ -726,3 +733,5 @@ if __name__ == '__main__':
     print('b.sig: ' + b.sig.hex())
     print('b.get_hash: ' + b.get_hash().hex())
     print('b.get_raw_for_hash: ' + b.get_raw_for_hash().hex())
+    print(b.get_raw_for_hash().hex()[0:2] + b.get_hash().hex() + b.get_raw_for_hash().hex()[2:])
+    print(b.get_transinfo())
