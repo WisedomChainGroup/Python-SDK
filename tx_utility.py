@@ -166,14 +166,14 @@ class Asset:
 
 class Transaction:
     def __init__(self, tx_from: bytes = b'', gas_price: int = 0, version: int = DEFAULT_VERSION, tx_type: str = "",
-                 tx_nonce: int = 0, tx_amount: int = 0, payload: bytes = b'', tx_to: bytes = b'', sig: bytes = b''):
+                 tx_nonce: int = 0, tx_amount: float = 0.0, payload: bytes = b'', tx_to: bytes = b'', sig: bytes = b''):
         self.version = version
         self.tx_type = tx_type
         self.tx_nonce = tx_nonce + NONCE
         self.tx_from = tx_from
         self.gas_price = gas_price
         self.version = version
-        self.tx_amount = tx_amount * RATE
+        self.tx_amount = int(tx_amount * RATE)
         self.payload = payload
         self.tx_to = tx_to
         self.sig = sig
@@ -237,7 +237,7 @@ class TxUtility:
         tx.sig = nacl.signing.SigningKey(sk).sign(tx.get_raw_for_sign())[0:-len(tx.get_raw_for_sign())]
 
     @staticmethod
-    def create_transfer_tx(tx_from: bytes, tx_to: bytes, tx_amount: int, tx_nonce: int) -> Transaction:
+    def create_transfer_tx(tx_from: bytes, tx_to: bytes, tx_amount: float, tx_nonce: int) -> Transaction:
         """
             构造交易事务
             :param tx_from: bytes
@@ -723,7 +723,7 @@ if __name__ == '__main__':
     # prikey = bytes.fromhex('f0d55ae8a79186e8595514fe23dec8716a191d2bb525998298371693dc69a926')
     fromPubkey = bytes.fromhex('fce8ec82c17bbd763e2edfbbd9ae9cb24bfa2181e166c4c8590435c6383a4465')
     toPubkeyHash = bytes.fromhex('a8dab9a3828d750174c25f09ab619f55d7533346')
-    amount = 10 * 100000000
+    amount = 10.1
     prikey = bytes.fromhex('a4643462e43c642418f638d5cb0ba7bf79d3887e7df0e146a0a7a1738eef0107')
     nonce = 1
     a = TxUtility()

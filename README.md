@@ -176,8 +176,8 @@ from tx_utility import TxUtility
 
 from_pubkey = b'from_pubkey'
 to_pubkey_hash = b'to_pubkey_hash'
-amount = 10 * 100000000
-nonce = 0 + 1
+amount = 10
+nonce = 0
 
 # 创建原生转账事务
 tx_utility = TxUtility()
@@ -186,7 +186,7 @@ transaction = tx_utility.create_transfer_tx(from_pubkey, to_pubkey_hash, amount,
 # 参数：
 #  1）、发送者公钥(bytes)
 #  2）、接收者公钥哈希（bytes)
-#  3）、转账金额(int)
+#  3）、转账金额(float)
 #  4）、nonce(int)
 # 返回类型：Transaction(bytes)
 # 返回值：未签名的事务
@@ -198,8 +198,8 @@ from tx_utility import TxUtility
 
 from_pubkey = b'from_pubkey'
 to_pubkey_hash = b'to_pubkey_hash'
-amount = 10 * 100000000
-nonce = 0 + 1
+amount = 10
+nonce = 0
 private_key = b"private_key"
 
 # 创建原生转账事务
