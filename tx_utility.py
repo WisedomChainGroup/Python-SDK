@@ -29,16 +29,21 @@ TYPE_DICT = {
                 "HASH_HEIGHT_BLOCK_FOR_DEPLOY": 7,
                 "HASH_HEIGHT_BLOCK_GET_FOR_DEPLOY": 8,
                 "HASH_HEIGHT_BLOCK_TRANSFER_FOR_DEPLOY": 8,
+                "RATE_HEIGHT_LOCK_RULE": 7,
+                "RATE_HEIGHT_LOCK_RULE_DEPOSIT_RULE_FOR_DEPLOY": 8,
+                "RATE_HEIGHT_LOCK_WITH_DRAW_RULE": 8,
             }
 TYPE_LIST_ZERO = ["TRANSFER", "TRANSFER_VOTE", "TRANSFER_VOTE_WITH", "TRANSFER_MORTGAGE", "TRANSFER_MORTGAGE_WITH", "TRANSFER_PROVE"]
 TYPE_LIST_ONE = ["DEPLOY_FOR_RULE_ASSET", "TRANSFER_CALL_FOR_RULE_ASSET_CHANGE_OWNER"]
 TYPE_LIST_TWO = ["TRANSFER_DEPLOY_FOR_RULE_ASSET", "MULTIPLE_FOR_RULE_FIRST", "MULTIPLE_FOR_RULE_SPLICE"]
 TYPE_LIST_THREE = ["TRANSFER_CALL_FOR_RULE_ASSET_INCREASED", "HASH_TIME_BLOCK_FOR_DEPLOY"]
 TYPE_LIST_FOUR = ["MULTI_SIGNATURE_FOR_FIRST", "HASH_HEIGHT_BLOCK_FOR_DEPLOY"]
-TYPE_LIST_FIVE = ["HASH_TIME_BLOCK_TRANSFER_FOR_DEPLOY"]
+TYPE_LIST_FIVE = ["HASH_TIME_BLOCK_TRANSFER_FOR_DEPLOY", "RATE_HEIGHT_LOCK_RULE"]
 TYPE_LIST_SIX = ["HASH_TIME_BLOCK_GET_FOR_DEPLOY"]
 TYPE_LIST_SEVEN = ["HASH_HEIGHT_BLOCK_TRANSFER_FOR_DEPLOY"]
 TYPE_LIST_EIGHT = ["HASH_HEIGHT_BLOCK_GET_FOR_DEPLOY"]
+TYPE_LIST_NINE = ["RATE_HEIGHT_LOCK_RULE_DEPOSIT_RULE_FOR_DEPLOY"]
+TYPE_LIST_TEN = ["RATE_HEIGHT_LOCK_WITH_DRAW_RULE"]
 DEFAULT_VERSION = 1
 
 
@@ -210,6 +215,10 @@ class Transaction:
             ret += Utils.encode_u8(6)
         elif self.tx_type in TYPE_LIST_EIGHT:
             ret += Utils.encode_u8(7)
+        elif self.tx_type in TYPE_LIST_NINE:
+            ret += Utils.encode_u8(8)
+        elif self.tx_type in TYPE_LIST_TEN:
+            ret += Utils.encode_u8(9)
         ret += self.payload
         return ret
 
@@ -702,6 +711,80 @@ class TxUtility:
         tx.tx_to = Utils.ripmed160(tx_hash)
         tx_amount_in = tx_amount * RATE
         tx_rlp = [tx_amount_in, tx_hash_result, tx_block_height]
+        tx.payload = rlp.encode(tx_rlp)
+        return tx
+
+    @staticmethod
+    def create_rate_height_lock_rule_tx(tx_from: bytes, tx_nonce: int, tx_asset_hash: bytes, tx_one_time_deposit_multiple: int, tx_with_draw_period_height: int, tx_with_draw_rate: str, tx_dest: bytes) -> Transaction:
+        """
+            构造签名的部署定额条件比例支付事务
+            :param tx_from: bytes
+            :param tx_nonce: int
+            :param tx_asset_hash: bytes
+            :param tx_one_time_deposit_multiple: int
+            :param tx_with_draw_period_height: int
+            :param tx_with_draw_rate: str
+            :param tx_dest: bytes
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type="RATE_HEIGHT_LOCK_RULE",
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_to=bytes.fromhex('0000000000000000000000000000000000000000'),
+            tx_amount=0
+        )
+        state_map = []
+        tx.gas_price = round(FEE / GAS_TABLE[2])
+        tx_rlp = [tx_asset_hash, tx_one_time_deposit_multiple, tx_with_draw_period_height, tx_with_draw_rate, tx_dest, state_map]
+        tx.payload = rlp.encode(tx_rlp)
+        return tx
+
+    @staticmethod
+    def create_rate_height_lock_deposit_rule_for_deploy_tx(tx_from: bytes, tx_to: bytes, tx_nonce: int, tx_value: int) -> Transaction:
+        """
+            构造签名的调用定额条件比例支付的转入金额事务
+            :param tx_from: bytes
+            :param tx_to: bytes
+            :param tx_nonce: int
+            :param tx_value: int
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type="RATE_HEIGHT_LOCK_RULE_DEPOSIT_RULE_FOR_DEPLOY",
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_amount=0
+        )
+        tx.tx_to = Utils.ripmed160(tx_to)
+        tx.gas_price = round(FEE / GAS_TABLE[2])
+        tx_rlp = [tx_value]
+        tx.payload = rlp.encode(tx_rlp)
+        return tx
+
+    @staticmethod
+    def create_rate_height_lock_with_draw_rule_tx(tx_from: bytes, tx_to: bytes, tx_nonce: int, tx_deposit_hash: bytes, to: bytes) -> Transaction:
+        """
+            构造调用的定额条件比例支付的转出事务
+            :param tx_from: bytes
+            :param tx_to: bytes
+            :param tx_nonce: int
+            :param tx_deposit_hash: bytes
+            :param to: bytes
+            :return: Transaction
+        """
+        tx = Transaction(
+            version=1,
+            tx_type="RATE_HEIGHT_LOCK_WITH_DRAW_RULE",
+            tx_nonce=tx_nonce,
+            tx_from=tx_from,
+            tx_amount=0
+        )
+        tx.tx_to = Utils.ripmed160(tx_to)
+        tx.gas_price = round(FEE / GAS_TABLE[2])
+        tx_rlp = [tx_deposit_hash, to]
         tx.payload = rlp.encode(tx_rlp)
         return tx
 
